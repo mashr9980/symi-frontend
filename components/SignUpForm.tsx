@@ -63,6 +63,7 @@ export default function SignUp() {
         const role = responseData.role;
         saveTokenWithExpiry(accessToken);
         localStorage.setItem("user_role", role);
+        localStorage.setItem("user_email", data.email);
         // Redirect based on user role
         if (role === "admin") {
             router.push("/blueprint"); // Redirect to admin dashboard

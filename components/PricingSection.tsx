@@ -54,6 +54,7 @@ export default function PricingSection() {
 
   const handleCheckout = async (planId: number) => {
     const accessToken = localStorage.getItem("access_token"); // Get access token from cache
+    const userEmail = localStorage.getItem("user_email");
     if (!accessToken) {
       alert("Access token not found. Please log in again.");
       router.push("/auth/login");
@@ -71,7 +72,7 @@ export default function PricingSection() {
           body: JSON.stringify({
             plan_id: planId,
             currency: "eur",
-            email: "waqas14@gmail.com", // Replace with dynamic email if needed
+            email: userEmail, // Replace with dynamic email if needed
           }),
         }
       );
