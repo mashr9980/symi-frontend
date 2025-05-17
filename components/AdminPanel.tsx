@@ -204,7 +204,7 @@ const AdminPanel = () => {
         setLoadingPlans(true);
         const accessToken = localStorage.getItem("access_token"); // Get access token from cache
         if (!accessToken) {
-          alert("Access token not found. Please log in again.");
+          //alert("Access token not found. Please log in again.");
           router.push("/auth/login");
           return;
         }
@@ -280,7 +280,7 @@ const AdminPanel = () => {
   const addProfession = async () => {
     const accessToken = localStorage.getItem("access_token"); // Get access token from cache
     if (!accessToken) {
-      alert("Access token not found. Please log in again.");
+     // alert("Access token not found. Please log in again.");
       return;
     }
 
@@ -814,7 +814,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
         <nav className="flex-1 px-4 space-y-2 lg:space-y-0 lg:flex lg:flex-col">
           <button
             className={`block w-full text-left px-4 py-2 rounded hover:bg-indigo-50 ${
-              tab === "dashboard" ? "bg-indigo-100 text-indigo-700" : ""
+              tab === "dashboard" ? "bg-indigo-100 text-indigo-700" : "text-gray-700 dark:text-gray-300"
             }`}
             onClick={() => handleTabChange("dashboard")}
           >
@@ -822,7 +822,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
           </button>
           <button
             className={`block w-full text-left px-4 py-2 rounded hover:bg-indigo-50 ${
-              tab === "professions" ? "bg-indigo-100 text-indigo-700" : ""
+              tab === "professions" ? "bg-indigo-100 text-indigo-700" : "text-gray-700 dark:text-gray-300"
             }`}
             onClick={() => handleTabChange("professions")}
           >
@@ -831,7 +831,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
 
           <button
             className={`block w-full text-left px-4 py-2 rounded hover:bg-indigo-50 ${
-              tab === "professionPrompts" ? "bg-indigo-100 text-indigo-700" : ""
+              tab === "professionPrompts" ? "bg-indigo-100 text-indigo-700" : "text-gray-700 dark:text-gray-300"
             }`}
             onClick={() => handleTabChange("professionPrompts")}
           >
@@ -840,7 +840,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
 
           <button
             className={`block w-full text-left px-4 py-2 rounded hover:bg-indigo-50 ${
-              tab === "chat" ? "bg-indigo-100 text-indigo-700" : ""
+              tab === "chat" ? "bg-indigo-100 text-indigo-700" : "text-gray-700 dark:text-gray-300"
             }`}
             onClick={() => handleTabChange("chat")}
           >
@@ -849,7 +849,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
 
           <button
             className={`block w-full text-left px-4 py-2 rounded hover:bg-indigo-50 ${
-              tab === "plans" ? "bg-indigo-100 text-indigo-700" : ""
+              tab === "plans" ? "bg-indigo-100 text-indigo-700" : "text-gray-700 dark:text-gray-300"
             }`}
             onClick={() => handleTabChange("plans")}
           >
@@ -858,7 +858,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
 
           <button
             className={`block w-full text-left px-4 py-2 rounded hover:bg-indigo-50 ${
-              tab === "settings" ? "bg-indigo-100 text-indigo-700" : ""
+              tab === "settings" ? "bg-indigo-100 text-indigo-700" : "text-gray-700 dark:text-gray-300"
             }`}
             onClick={() => handleTabChange("settings")}
           >
@@ -878,7 +878,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
         {tab === "dashboard" && (
           <div>
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-              <h1 className="text-lg sm:text-2xl font-semibold">
+              <h1 className="text-lg sm:text-2xl font-semibold text-gray-700 dark:text-gray-300" >
                 User Management
               </h1>
               {/* <button
@@ -888,7 +888,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
                 Add New User
               </button> */}
             </div>
-            <div className="w-full overflow-auto bg-white rounded-lg shadow p-4">
+            <div className="w-full overflow-auto bg-white rounded-lg shadow p-4 text-gray-700 dark:text-gray-300">
               <table className="min-w-[600px] w-full text-sm">
                 <thead>
                   <tr className="text-left text-xs text-gray-500 border-b">
@@ -920,10 +920,10 @@ const deleteProfessionPrompt = async (promptId: number) => {
 
         {tab === "chat" && (
           <div>
-            <h1 className="text-lg sm:text-2xl font-semibold mb-4">
+            <h1 className="text-lg sm:text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-300">
               Chat History
             </h1>
-            <div className="w-full overflow-auto bg-white rounded-lg shadow p-4">
+            <div className="w-full overflow-auto bg-white rounded-lg shadow p-4 text-gray-700 dark:text-gray-300">
               <table className="min-w-[600px] w-full text-sm">
                 <thead>
                   <tr className="text-left text-xs text-gray-500 border-b">
@@ -974,7 +974,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
 
         {tab === "professions" && (
           <div>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4 text-gray-700 dark:text-gray-300">
               <h1 className="text-lg sm:text-2xl font-semibold">List of Professions</h1>
               <button
                 onClick={() => setAddProfessionModal(true)}
@@ -984,7 +984,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
               </button>
             </div>
 
-            <div className="w-full overflow-auto bg-white rounded-lg shadow p-4">
+            <div className="w-full overflow-auto bg-white rounded-lg shadow p-4 text-gray-700 dark:text-gray-300">
               {loadingProfessions ? (
                 <p>Loading professions...</p>
               ) : (
@@ -1030,8 +1030,8 @@ const deleteProfessionPrompt = async (promptId: number) => {
 
         {tab === "settings" && (
           <div>
-            <h1 className="text-lg sm:text-2xl font-semibold mb-4">Settings</h1>
-            <div className="bg-white p-4 sm:p-6 rounded-lg shadow space-y-4 max-w-lg">
+            <h1 className="text-lg sm:text-2xl font-semibold mb-4 text-gray-700 dark:text-gray-300">Settings</h1>
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow space-y-4 max-w-lg text-gray-700 dark:text-gray-300">
               {/* <div>
                 <label className="block text-sm font-medium mb-1">
                   App Name
@@ -1076,7 +1076,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
 
         {tab === "plans" && (
   <div>
-    <div className="flex justify-between items-center mb-4">
+    <div className="flex justify-between items-center mb-4 text-gray-700 dark:text-gray-300">
       <h1 className="text-lg sm:text-2xl font-semibold">Plans</h1>
       <button
         onClick={() => setAddPlanModal(true)}
@@ -1085,7 +1085,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
         Add Plan
       </button>
     </div>
-    <div className="w-full overflow-auto bg-white rounded-lg shadow p-4">
+    <div className="w-full overflow-auto bg-white rounded-lg shadow p-4 text-gray-700 dark:text-gray-300">
       {loadingPlans ? (
         <p>Loading plans...</p>
       ) : (
@@ -1143,7 +1143,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
 
         {tab === "professionPrompts" && (
           <div>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-4 text-gray-700 dark:text-gray-300">
               <h1 className="text-lg sm:text-2xl font-semibold">Profession with Prompts</h1>
               <button
                 onClick={() => setAddProfessionPromptModal(true)}
@@ -1152,7 +1152,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
                 Add Profession with Prompt
               </button>
             </div>
-            <div className="w-full overflow-visible bg-white rounded-lg shadow p-4">
+            <div className="w-full overflow-visible bg-white rounded-lg shadow p-4 text-gray-700 dark:text-gray-300">
               {loadingProfessionPrompts ? (
                 <p>Loading profession prompts...</p>
               ) : (
@@ -1279,7 +1279,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
           onClick={() => setStatusModal(false)}
         >
           <div
-            className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md"
+            className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md text-gray-700 dark:text-gray-300"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-lg font-semibold mb-4">Change User Status</h2>
@@ -1320,7 +1320,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
               onClick={() => setAddProfessionModal(false)}
             >
               <div
-                className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md"
+                className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md text-gray-700 dark:text-gray-300"
                 onClick={(e) => e.stopPropagation()}
               >
                 <h2 className="text-lg font-semibold mb-4">Add New Profession</h2>
@@ -1369,7 +1369,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
               onClick={() => setEditProfessionModal(false)}
             >
               <div
-                className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md"
+                className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md text-gray-700 dark:text-gray-300"
                 onClick={(e) => e.stopPropagation()}
               >
                 <h2 className="text-lg font-semibold mb-4">Edit Profession</h2>
@@ -1420,7 +1420,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
         onClick={() => setAddPlanModal(false)}
       >
         <div
-          className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md"
+          className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md text-gray-700 dark:text-gray-300"
           onClick={(e) => e.stopPropagation()}
         >
           <h2 className="text-lg font-semibold mb-4">Add New Plan</h2>
@@ -1525,7 +1525,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
         onClick={() => setEditPlanModal(false)}
       >
         <div
-          className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md"
+          className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md text-gray-700 dark:text-gray-300"
           onClick={(e) => e.stopPropagation()}
         >
           <h2 className="text-lg font-semibold mb-4">Edit Plan</h2>
@@ -1634,14 +1634,14 @@ const deleteProfessionPrompt = async (promptId: number) => {
         onClick={() => setShowPromptModal(false)} // Close the modal on background click
       >
         <div
-          className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-lg max-h-[80vh] overflow-y-auto"
+          className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md text-gray-700 dark:text-gray-300"
           onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
         >
           <h2 className="text-lg font-semibold mb-4">System Prompt</h2>
           <div className="text-sm text-gray-800 whitespace-pre-line overflow-y-auto max-h-[60vh]">
             {selectedPrompt}
           </div>
-          <div className="flex justify-end mt-4">
+          <div className="flex justify-end mt-4 ">
             <button
               className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
               onClick={() => setShowPromptModal(false)} // Close the modal
@@ -1655,11 +1655,11 @@ const deleteProfessionPrompt = async (promptId: number) => {
 
     {addProfessionPromptModal && (
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 "
         onClick={() => setAddProfessionPromptModal(false)} // Close the modal on background click
       >
         <div
-          className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md"
+          className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md text-gray-700 dark:text-gray-300"
           onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
         >
           <h2 className="text-lg font-semibold mb-4">Add Profession with Prompt</h2>
@@ -1730,7 +1730,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
         onClick={() => setEditProfessionPromptModal(false)} // Close the modal on background click
       >
         <div
-          className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md"
+          className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md text-gray-700 dark:text-gray-300"
           onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
         >
           <h2 className="text-lg font-semibold mb-4">Edit Profession with Prompt</h2>
