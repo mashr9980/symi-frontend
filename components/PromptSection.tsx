@@ -165,7 +165,7 @@ export default function PromptSection() {
       <div className="absolute inset-0 bg-gradient-to-r from-purple-100 to-white -z-10"></div>
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-br from-blue-500/20 to-purple-500/30 rounded-3xl blur-3xl" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-gray-700 dark:text-gray-300">
         {/* Header */}
         <div className="text-center mb-16">
           <h4 className="section-subhead mb-6 py-10 whitespace-pre-line">

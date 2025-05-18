@@ -41,7 +41,7 @@ export default function LoginForm() {
         if (role === "admin") {
           router.push("/blueprint"); // Redirect to admin dashboard
         } else {
-          router.push("/prompt"); // Redirect to prompt page
+          router.push("/"); // Redirect to prompt page
         }
       } else {
         const errorData = await response.json();

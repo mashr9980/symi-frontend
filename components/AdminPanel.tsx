@@ -76,7 +76,7 @@ const AdminPanel = () => {
   const addPlan = async () => {
     const accessToken = localStorage.getItem("access_token"); // Get access token from cache
     if (!accessToken) {
-      alert("Access token not found. Please log in again.");
+      //alert("Access token not found. Please log in again.");
       return;
     }
   
@@ -122,7 +122,7 @@ const AdminPanel = () => {
   const updatePlan = async () => {
     const accessToken = localStorage.getItem("access_token"); // Get access token from cache
     if (!accessToken) {
-      alert("Access token not found. Please log in again.");
+      //alert("Access token not found. Please log in again.");
       return;
     }
   
@@ -165,7 +165,7 @@ const AdminPanel = () => {
   const deletePlan = async (planId: number) => {
     const accessToken = localStorage.getItem("access_token"); // Get access token from cache
     if (!accessToken) {
-      alert("Access token not found. Please log in again.");
+      //alert("Access token not found. Please log in again.");
       return;
     }
   
@@ -317,7 +317,7 @@ const AdminPanel = () => {
   const updateProfession = async () => {
     const accessToken = localStorage.getItem("access_token"); // Get access token from cache
     if (!accessToken) {
-      alert("Access token not found. Please log in again.");
+      //alert("Access token not found. Please log in again.");
       return;
     }
 
@@ -361,7 +361,7 @@ const AdminPanel = () => {
   const deleteProfession = async (professionId: number) => {
     const accessToken = localStorage.getItem("access_token"); // Get access token from cache
     if (!accessToken) {
-      alert("Access token not found. Please log in again.");
+      //alert("Access token not found. Please log in again.");
       return;
     }
 
@@ -436,7 +436,7 @@ const AdminPanel = () => {
   const openChatModal = async (user: any) => {
     const accessToken = localStorage.getItem("access_token"); // Get access token from cache
     if (!accessToken) {
-      alert("Access token not found. Please log in again.");
+      //alert("Access token not found. Please log in again.");
       return;
     }
   
@@ -479,7 +479,7 @@ const AdminPanel = () => {
 
     const accessToken = localStorage.getItem("access_token");
     if (!accessToken) {
-      alert("Access token not found. Please log in again.");
+      //alert("Access token not found. Please log in again.");
       return;
     }
 
@@ -565,7 +565,7 @@ useEffect(() => {
 const deleteUser = async (userId: number) => {
   const accessToken = localStorage.getItem("access_token"); // Get access token from cache
   if (!accessToken) {
-    alert("Access token not found. Please log in again.");
+    //alert("Access token not found. Please log in again.");
     return;
   }
 
@@ -602,7 +602,7 @@ const deleteUser = async (userId: number) => {
 const saveSettings = async () => {
   const accessToken = localStorage.getItem("access_token"); // Get access token from cache
   if (!accessToken) {
-    alert("Access token not found. Please log in again.");
+    //alert("Access token not found. Please log in again.");
     return;
   }
 
@@ -636,7 +636,7 @@ useEffect(() => {
     if (tab === "settings") {
       const accessToken = localStorage.getItem("access_token"); // Get access token from cache
       if (!accessToken) {
-        alert("Access token not found. Please log in again.");
+        //alert("Access token not found. Please log in again.");
         return;
       }
 
@@ -672,7 +672,7 @@ useEffect(() => {
       setLoadingProfessionPrompts(true);
       const accessToken = localStorage.getItem("access_token"); // Get access token from cache
       if (!accessToken) {
-        alert("Access token not found. Please log in again.");
+        //alert("Access token not found. Please log in again.");
         router.push("/auth/login");
         return;
       }
@@ -702,7 +702,7 @@ useEffect(() => {
 const addProfessionPrompt = async () => {
   const accessToken = localStorage.getItem("access_token"); // Get access token from cache
   if (!accessToken) {
-    alert("Access token not found. Please log in again.");
+    //alert("Access token not found. Please log in again.");
     return;
   }
 
@@ -736,7 +736,7 @@ const addProfessionPrompt = async () => {
 const updateProfessionPrompt = async () => {
   const accessToken = localStorage.getItem("access_token"); // Get access token from cache
   if (!accessToken) {
-    alert("Access token not found. Please log in again.");
+    //alert("Access token not found. Please log in again.");
     return;
   }
 
@@ -773,7 +773,7 @@ const updateProfessionPrompt = async () => {
 const deleteProfessionPrompt = async (promptId: number) => {
   const accessToken = localStorage.getItem("access_token"); // Get access token from cache
   if (!accessToken) {
-    alert("Access token not found. Please log in again.");
+    //alert("Access token not found. Please log in again.");
     return;
   }
 
