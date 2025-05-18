@@ -47,7 +47,7 @@ export default function Home() {
     const timer = setTimeout(() => {
       // Check if access token exists in localStorage
       const accessToken = localStorage.getItem("access_token");
-      router.push("/blueprint");
+      //router.push("/blueprint");
       // if (accessToken) {
       //   // Redirect to the home page if the token exists
       //   router.push("/blueprint");

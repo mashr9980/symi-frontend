@@ -22,7 +22,7 @@ export default function PricingSection() {
     const fetchPricingPlans = async () => {
       const accessToken = localStorage.getItem("access_token"); // Get access token from cache
       if (!accessToken) {
-        alert("Access token not found. Please log in again.");
+        //alert("Access token not found. Please log in again.");
         router.push("/auth/login");
         return;
       }
@@ -56,7 +56,7 @@ export default function PricingSection() {
     const accessToken = localStorage.getItem("access_token"); // Get access token from cache
     const userEmail = localStorage.getItem("user_email");
     if (!accessToken) {
-      alert("Access token not found. Please log in again.");
+      //alert("Access token not found. Please log in again.");
       router.push("/auth/login");
       return;
     }
