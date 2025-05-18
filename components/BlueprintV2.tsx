@@ -1,10 +1,20 @@
 "use client";
-import { useEffect } from "react";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import FinalCTA from "./FinalCTA";
-import { Play, ChevronDown } from "lucide-react";
+import { Play, ChevronDown, X } from "lucide-react";
+
+const exampleImages = [
+  "/assets/examples/symivision.jpg",
+  "/assets/examples/aftersymi.jpg"  
+];
 
 export default function BlueprintV2() {
+  // Popup state
+  const [showPopup, setShowPopup] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   // Optional scroll effect on flow steps
   useEffect(() => {
     const handleScroll = () => {
@@ -19,6 +29,15 @@ export default function BlueprintV2() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Auto-scroll images in popup every 3 seconds
+  useEffect(() => {
+    if (!showPopup) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev === exampleImages.length - 1 ? 0 : prev + 1));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [showPopup]);
+
   return (
     <section className="relative overflow-hidden py-24 sm:py-32">
       {/* Background */}
@@ -29,15 +48,12 @@ export default function BlueprintV2() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Form Column */}
           <div className="text-center lg:text-left">
-     
             <h2 className="text-4xl sm:text-5xl font-semibold text-gray-900 leading-snug mt-1">
               BLUEPRINT
             </h2>
-
             <p className="text-md text-gray-500 mt-2">
               Your architecture. Our precision.
             </p>
-
             <div className="text-lg sm:text-xl text-gray-800 max-w-2xl mx-auto pb-12 mt-6">
               The Blueprint is your personalized system architecture. Designed to scale with Precision maps your growth into automations, assets and flow. Your answer - we build.
             </div>
@@ -65,12 +81,43 @@ export default function BlueprintV2() {
             Start with Blueprint
           </Link>
 
-          <button className="border-2 bg-[#5212ff] text-white  px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse">
+          <button
+            className="border-2 bg-[#5212ff] text-white  px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse"
+            onClick={() => setShowPopup(true)}
+          >
             View Example
           </button>
         </div>
         {/* <FinalCTA /> */}
       </div>
+
+      {/* Popup with auto-scrolling image carousel */}
+      {showPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-3xl w-full relative">
+            <button
+              className="absolute top-4 right-4 text-gray-500 hover:text-[#5212ff] transition-colors"
+              onClick={() => setShowPopup(false)}
+              aria-label="Close"
+              style={{ padding: 0, background: "none", border: "none" }}
+            >
+              <span className="flex items-center justify-center rounded-full bg-gray-100 hover:bg-[#ece6ff] w-12 h-12 shadow-md transition-all">
+                <X size={32} className="text-[#5212ff]" />
+              </span>
+            </button>
+            <div className="flex flex-col items-center">
+              <img
+                src={exampleImages[currentIndex]}
+                alt={`Example ${currentIndex + 1}`}
+                className="w-full h-[32rem] object-contain rounded-xl mb-4 transition-all duration-500"
+              />
+              {/* <div className="text-gray-700 font-medium mt-2 text-lg">
+                {currentIndex + 1} / {exampleImages.length}
+              </div> */}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
