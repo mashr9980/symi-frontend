@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation"; // For navigation
 import config from "../config";
-import { isTokenExpired, handleLogout } from "../utils/auth"; // Import utility functions
+import { isTokenExpired, handleLogout, getPaymentStatusFromCache } from "../utils/auth";
 
 export default function PromptSection() {
   const [question, setQuestion] = useState("Connecting to WebSocket..."); // Dynamic question from WebSocket
@@ -15,7 +15,7 @@ export default function PromptSection() {
   const [businessName, setBusinessName] = useState(""); // Tracks the business name input
   const [ownerName, setOwnerName] = useState(""); // Tracks the owner name input
   const router = useRouter(); // Initialize the router
- 
+
   // Check if the user is logged in
   useEffect(() => {
     const accessToken = localStorage.getItem("access_token");
@@ -24,6 +24,19 @@ export default function PromptSection() {
     } else {
       setIsAuthorized(true); // Allow access to the page
     }
+  }, [router]);
+
+// Check payment status before allowing access
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const { status, expiredStatus } = getPaymentStatusFromCache ? getPaymentStatusFromCache() : {};
+      if (status === "premium" && expiredStatus === false) {
+        //router.replace("/prompt");
+        //return;
+      }else{
+        router.replace("/pricing");
+      }
+    // else continue as normal
   }, [router]);
 
   // Handle user input change

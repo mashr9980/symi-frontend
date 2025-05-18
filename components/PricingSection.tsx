@@ -4,30 +4,39 @@ import { useEffect, useState } from "react";
 import { CheckCircle } from "lucide-react";
 import FinalCTA from "./FinalCTA";
 import Link from "next/link";
-import config from "../config"; // Import your config file
-import { isTokenExpired, handleLogout } from "../utils/auth"; // Import utility functions
+import config from "../config";
+import { isTokenExpired, handleLogout, getPaymentStatusFromCache } from "../utils/auth";
 import { useRouter } from "next/navigation";
 
 export default function PricingSection() {
-  const [plans, setPlans] = useState<any[]>([]); // State to store pricing plans
+  const [plans, setPlans] = useState<any[]>([]);
   const router = useRouter();
-  const [userRole, setUserRole] = useState<string | null>(null); // State to store user role
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [activePlanId, setActivePlanId] = useState<number | null>(null);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
-    const role = localStorage.getItem("user_role"); // Assume the role is stored in localStorage
-    setUserRole(role); // Set the user role
-  }, []);
+  const role = localStorage.getItem("user_role");
+  setUserRole(role);
+
+  // Use getPaymentStatusFromCache to get payment status, plan_id, and premium status
+  const { status, plan_id } = getPaymentStatusFromCache ? getPaymentStatusFromCache() : {};
+  if (plan_id) {
+    setActivePlanId(Number(plan_id)); // Ensure number type
+  } else {
+    setActivePlanId(null);
+  }
+  setIsPremium(status === "premium");
+}, []);
 
   useEffect(() => {
     const fetchPricingPlans = async () => {
-      const accessToken = localStorage.getItem("access_token"); // Get access token from cache
+      const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {
-        //alert("Access token not found. Please log in again.");
         router.push("/auth/login");
         return;
       }
 
-      // Check if token is expired before making the request
       if (isTokenExpired()) {
         handleLogout(router);
         return;
@@ -40,7 +49,7 @@ export default function PricingSection() {
 
         if (response.ok) {
           const data = await response.json();
-          setPlans(data); // Populate the pricing cards with the fetched data
+          setPlans(data);
         } else {
           console.error("Failed to fetch pricing plans.");
         }
@@ -53,14 +62,13 @@ export default function PricingSection() {
   }, [router]);
 
   const handleCheckout = async (planId: number) => {
-    const accessToken = localStorage.getItem("access_token"); // Get access token from cache
+    const accessToken = localStorage.getItem("access_token");
     const userEmail = localStorage.getItem("user_email");
     if (!accessToken) {
-      //alert("Access token not found. Please log in again.");
       router.push("/auth/login");
       return;
     }
-  
+
     try {
       const response = await fetch(
         `${config.apiBaseUrl}/payment/create-checkout-session?token=${accessToken}`,
@@ -72,14 +80,13 @@ export default function PricingSection() {
           body: JSON.stringify({
             plan_id: planId,
             currency: "eur",
-            email: userEmail, // Replace with dynamic email if needed
+            email: userEmail,
           }),
         }
       );
-  
+
       if (response.ok) {
         const data = await response.json();
-        // Navigate to the checkout URL in the same tab
         router.push(data.checkout_url);
       } else {
         console.error("Failed to create checkout session.");
@@ -109,13 +116,14 @@ export default function PricingSection() {
           {plans.map((plan, index) => (
             <div
               key={index}
-              className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 shadow-lg max-w-s mx-auto sm:max-w-lg hover:scale-105 hover:translate-y-1 hover:shadow-2xl transition-all duration-200 active:scale-95"
-              style={{ width: "375px", height: "500px" }} // Fixed width and height
+              className={`bg-white/5 backdrop-blur-sm rounded-3xl p-8 shadow-lg max-w-s mx-auto sm:max-w-lg hover:scale-105 hover:translate-y-1 hover:shadow-2xl transition-all duration-200 active:scale-95
+                ${activePlanId === Number(plan.id) && isPremium ? "border-4 border-indigo-600" : ""}`}
+              style={{ width: "375px", height: "500px" }}
             >
               <div className="mb-6 text-center">
                 <div className="w-16 h-16 mb-4 mx-auto">
                   <img
-                    src="/assets/icons/cc7.png" // Replace with dynamic icon if available
+                    src="/assets/icons/cc7.png"
                     alt={plan.name}
                   />
                 </div>
@@ -130,15 +138,23 @@ export default function PricingSection() {
                   <FeatureItem key={i} text={feature} />
                 ))}
               </div>
-              <button
-                onClick={() => handleCheckout(plan.id)}
-                className={`w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-all ${
-                  userRole === "admin" ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                disabled={userRole === "admin"} // Disable button if user is admin
-              >
-                Start this Plan
-              </button>
+              {activePlanId === Number(plan.id) && isPremium ? (
+                <div className="w-full flex justify-center items-center py-3">
+                  <span className="inline-block bg-green-100 text-green-700 px-4 py-2 rounded-xl font-semibold text-lg">
+                    Active
+                  </span>
+                </div>
+              ) : (
+                <button
+                  onClick={() => handleCheckout(plan.id)}
+                  className={`w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-all ${
+                    userRole === "admin" ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  disabled={userRole === "admin"}
+                >
+                  Start this Plan
+                </button>
+              )}
             </div>
           ))}
         </div>

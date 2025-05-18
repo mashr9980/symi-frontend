@@ -7,7 +7,7 @@ import Diagram from "./Diagram";
 import FinalCTA from "./FinalCTA";
 import config from "../config";
 import { useRouter } from "next/navigation";
-import { isTokenExpired } from "../utils/auth"; // Import utility functions
+import { isTokenExpired, getPaymentStatusFromCache } from "../utils/auth";
 const CHAT_STORAGE_KEY = "symi_hero_chat";
 
 export default function HeroSection() {
@@ -20,11 +20,48 @@ export default function HeroSection() {
   const [chatHistory, setChatHistory] = useState<{ user: string; ai: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [trialExpired, setTrialExpired] = useState(false);
-  
+
   const router = useRouter();
 
   // WebSocket ref
   const wsRef = useRef<WebSocket | null>(null);
+
+  // Restore chat from localStorage if present
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem(CHAT_STORAGE_KEY);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (
+          parsed &&
+          typeof parsed === "object" &&
+          Array.isArray(parsed) &&
+          parsed.length === 1 &&
+          typeof parsed[0].user === "string" &&
+          typeof parsed[0].ai === "string"
+        ) {
+          setChatHistory(parsed);
+
+          // --- Check payment status on page load if chatHistory exists ---
+          const { status, expiredStatus } = getPaymentStatusFromCache ? getPaymentStatusFromCache() : {};
+          if (status === "premium" && expiredStatus === false) {
+            router.replace("/prompt");
+            return;
+          } else if (status !== "premium" || expiredStatus === true) {
+            router.replace("/pricing");
+            return;
+          }
+          // Only show popup if not logged in or is admin
+          setHasAskedSecondQuestion(true);
+          setTrialExpired(true);
+          return;
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }, [router]);
 
   // Helper to get user role and login status from cache/localStorage
   function getUserRole() {
@@ -35,40 +72,6 @@ export default function HeroSection() {
       return null;
     }
   }
-  
-  // On mount, check localStorage for previous chat
-useEffect(() => {
-    // Redirect if logged in and not admin
-    if (typeof window !== "undefined") {
-      const loggedIn = !isTokenExpired();
-      const role = getUserRole();
-      if (loggedIn && role !== "admin") {
-        router.replace("/prompt");
-        return;
-      }
-      // Existing chat restore logic
-      const saved = localStorage.getItem(CHAT_STORAGE_KEY);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (
-            parsed &&
-            typeof parsed === "object" &&
-            Array.isArray(parsed) &&
-            parsed.length === 1 &&
-            typeof parsed[0].user === "string" &&
-            typeof parsed[0].ai === "string"
-          ) {
-            setChatHistory(parsed);
-            setChatStarted(true);
-          }
-        } catch {
-          // ignore
-        }
-      }
-    }
-  }, [router]);
-
 
   // Helper to extract message content from JSON or plain string
   function extractMessage(data: string) {
@@ -84,59 +87,62 @@ useEffect(() => {
   }
 
   // Connect and send message via WebSocket
-const handleChatSend = async () => {
-  if (!inputText.trim() || loading) return;
+  const handleChatSend = async () => {
+    if (!inputText.trim() || loading) return;
 
-  // If first chat is done and user tries to send again
-  if (chatHistory.length > 0) {
-    const role = getUserRole();
-    const isUserLogedin = isTokenExpired();
-    if (!isUserLogedin && role !== "admin") {
-      router.push("/prompt");
+    // If first chat is done and user tries to send again
+    if (chatHistory.length > 0) {
+      // 1. Check payment status from cache
+      const { status, expiredStatus } = getPaymentStatusFromCache ? getPaymentStatusFromCache() : {};
+      if (status === "premium" && expiredStatus === false) {
+        router.replace("/prompt");
+        return;
+      } else if (status !== "premium" || expiredStatus === true) {
+        router.replace("/pricing");
+        return;
+      }
+      // Only show popup if not logged in or is admin
+      setHasAskedSecondQuestion(true);
+      setTrialExpired(true);
       return;
     }
-    // Only show popup if not logged in or is admin
-    setHasAskedSecondQuestion(true);
-    setTrialExpired(true);
-    return;
-  }
 
-  setLoading(true);
-  setChatStarted(true);
+    setLoading(true);
+    setChatStarted(true);
 
-  if (chatHistory.length === 0) {
-    // Open WebSocket connection if not already open
-    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-      wsRef.current = new WebSocket(config.webSocketUrl);
+    if (chatHistory.length === 0) {
+      // Open WebSocket connection if not already open
+      if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+        wsRef.current = new WebSocket(config.webSocketUrl);
 
-      wsRef.current.onopen = () => {
-        wsRef.current?.send(inputText);
-      };
+        wsRef.current.onopen = () => {
+          wsRef.current?.send(inputText);
+        };
 
-      wsRef.current.onmessage = (event) => {
-        const aiMessage = extractMessage(event.data);
-        const chat = [{ user: inputText, ai: aiMessage }];
-        setChatHistory(chat);
-        setLoading(false);
+        wsRef.current.onmessage = (event) => {
+          const aiMessage = extractMessage(event.data);
+          const chat = [{ user: inputText, ai: aiMessage }];
+          setChatHistory(chat);
+          setLoading(false);
 
-        // Save to localStorage
-        if (typeof window !== "undefined") {
-          localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chat));
-        }
+          // Save to localStorage
+          if (typeof window !== "undefined") {
+            localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chat));
+          }
 
-        wsRef.current?.close();
-      };
+          wsRef.current?.close();
+        };
 
-      wsRef.current.onerror = () => {
-        setChatHistory([{ user: inputText, ai: "Sorry, there was a connection error." }]);
-        setLoading(false);
-      };
-    } else {
-      wsRef.current.send(inputText);
-      setInputText("");
+        wsRef.current.onerror = () => {
+          setChatHistory([{ user: inputText, ai: "Sorry, there was a connection error." }]);
+          setLoading(false);
+        };
+      } else {
+        wsRef.current.send(inputText);
+        setInputText("");
+      }
     }
-  }
-};
+  };
 
   // Don't disable input after first chat, only disable when loading or popup
   const chatDisabled = loading || trialExpired;
@@ -157,46 +163,46 @@ const handleChatSend = async () => {
 
         {/* Input Section */}
         <div className="w-full relative sacred-input-container">
-  <input
-    type="text"
-    value={inputText}
-    onChange={(e) => setInputText(e.target.value)}
-    placeholder={loading ? "Sending..." : "Type one sentence. We’ll do the rest."}
-    className={`text-gray-700 dark:text-gray-300 w-full pr-24 px-6 py-4 rounded-xl border border-gray-300 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3300fa] transition ${loading ? "bg-gray-100 text-gray-400" : ""}`}
-    disabled={chatDisabled}
-    onKeyDown={(e) => {
-      if (e.key === "Enter") handleChatSend();
-    }}
-  />
-  {loading && (
-    <span className="absolute right-24 top-1/2 -translate-y-1/2 flex items-center">
-      <svg className="animate-spin h-5 w-5 mr-2 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-      </svg>
-      <span className="text-purple-500 text-sm">Sending...</span>
-    </span>
-  )}
+          <input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder={loading ? "Sending..." : "Type one sentence. We’ll do the rest."}
+            className={`text-gray-700 dark:text-gray-300 w-full pr-24 px-6 py-4 rounded-xl border border-gray-300 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3300fa] transition ${loading ? "bg-gray-100 text-gray-400" : ""}`}
+            disabled={chatDisabled}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleChatSend();
+            }}
+          />
+          {loading && (
+            <span className="absolute right-24 top-1/2 -translate-y-1/2 flex items-center">
+              <svg className="animate-spin h-5 w-5 mr-2 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+              <span className="text-purple-500 text-sm">Sending...</span>
+            </span>
+          )}
 
-  {/* Image Upload */}
-  <motion.button
-    className="absolute right-14 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-gray-100 transition"
-    onClick={() => fileInputRef.current?.click()}
-    disabled={chatDisabled}
-  >
-    <ImageIcon className="w-6 h-6 text-sacred-ash" />
-    <input ref={fileInputRef} type="file" hidden accept="image/*" />
-  </motion.button>
+          {/* Image Upload */}
+          <motion.button
+            className="absolute right-14 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-gray-100 transition"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={chatDisabled}
+          >
+            <ImageIcon className="w-6 h-6 text-sacred-ash" />
+            <input ref={fileInputRef} type="file" hidden accept="image/*" />
+          </motion.button>
 
-  {/* Send Button */}
-  <motion.button
-    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-sacred-ash text-sacred-ground rounded-full"
-    onClick={handleChatSend}
-    disabled={chatDisabled}
-  >
-    <Send className="w-6 h-6" />
-  </motion.button>
-</div>
+          {/* Send Button */}
+          <motion.button
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-sacred-ash text-sacred-ground rounded-full"
+            onClick={handleChatSend}
+            disabled={chatDisabled}
+          >
+            <Send className="w-6 h-6" />
+          </motion.button>
+        </div>
 
         {/* Flow Diagram */}
         <Diagram />
@@ -206,37 +212,37 @@ const handleChatSend = async () => {
 
         {/* Chat Section */}
         <div className="w-full max-w-xl mx-auto mt-8">
-  {(chatHistory.length > 0 || loading) && (
-    <div className="bg-white/80 dark:bg-gray-900/60 rounded-xl shadow p-6 mb-4 text-left text-gray-700 dark:text-gray-300">
-      <div className="mb-2 flex items-center">
-        <span className="font-semibold text-indigo-700 dark:text-indigo-300">You:</span>
-        <span className="ml-2 flex items-center">
-          {chatHistory.length > 0 ? chatHistory[0].user : inputText}
-          {loading && (
-            <span className="inline-flex items-center ml-2">
-              <svg className="animate-spin h-5 w-5 mr-1 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-              </svg>
-              Sending...
-            </span>
+          {(chatHistory.length > 0 || loading) && (
+            <div className="bg-white/80 dark:bg-gray-900/60 rounded-xl shadow p-6 mb-4 text-left text-gray-700 dark:text-gray-300">
+              <div className="mb-2 flex items-center">
+                <span className="font-semibold text-indigo-700 dark:text-indigo-300">You:</span>
+                <span className="ml-2 flex items-center">
+                  {chatHistory.length > 0 ? chatHistory[0].user : inputText}
+                  {loading && (
+                    <span className="inline-flex items-center ml-2">
+                      <svg className="animate-spin h-5 w-5 mr-1 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                      </svg>
+                      Sending...
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div>
+                <span className="font-semibold text-purple-700 dark:text-purple-300">SYMI:</span>
+                <span className="ml-2">
+                  {chatHistory[0]?.ai}
+                </span>
+              </div>
+              <div className="text-xs text-gray-400 mt-2">
+                {loading
+                  ? "SYMI is thinking..."
+                  : "Chat is limited to one question. To continue, try asking another question."}
+              </div>
+            </div>
           )}
-        </span>
-      </div>
-      <div>
-        <span className="font-semibold text-purple-700 dark:text-purple-300">SYMI:</span>
-        <span className="ml-2">
-          {chatHistory[0]?.ai}
-        </span>
-      </div>
-      <div className="text-xs text-gray-400 mt-2">
-        {loading
-          ? "SYMI is thinking..."
-          : "Chat is limited to one question. To continue, try asking another question."}
-      </div>
-    </div>
-  )}
-</div>
+        </div>
 
         {/* Final CTA */}
         <div className="mt-16">

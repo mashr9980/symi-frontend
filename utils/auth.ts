@@ -1,3 +1,6 @@
+import config from "../config"; // Make sure config is imported
+
+
 export const handleLogout = (
     router: ReturnType<typeof import("next/navigation").useRouter>, // Accept the router object
     setIsLoggedIn?: (value: boolean) => void,
@@ -7,6 +10,7 @@ export const handleLogout = (
     localStorage.removeItem("access_token");
     localStorage.removeItem("user_role");
     localStorage.removeItem("token_expiry");
+    localStorage.removeItem("payment_status");
   
     if (setIsLoggedIn) setIsLoggedIn(false);
     if (setIsAdmin) setIsAdmin(false);
@@ -18,11 +22,29 @@ export const handleLogout = (
   };
 
   // Save token with expiry
-  export const saveTokenWithExpiry = (token: string) => {
-    const expiryTime = Date.now() + 5400000; // Current time + duration in milliseconds
-    localStorage.setItem("access_token", token);
-    localStorage.setItem("token_expiry", expiryTime.toString());
-  };
+export const saveTokenWithExpiry = async (token: string) => {
+  const expiryTime = Date.now() + 5400000; // Current time + duration in milliseconds
+  localStorage.setItem("access_token", token);
+  localStorage.setItem("token_expiry", expiryTime.toString());
+
+  // Fetch payment status and save to cache
+  try {
+    const accessToken = token || localStorage.getItem("access_token");
+    const response = await fetch(`${config.apiBaseUrl}/payment/status?token=${accessToken}`);
+    if (response.ok) {
+      const data = await response.json();
+      localStorage.setItem("payment_status", JSON.stringify(data));
+    }
+  } catch (error) {
+    console.error("Failed to fetch payment status:", error);
+  }
+};
+
+  // export const saveTokenWithExpiry = (token: string) => {
+  //   const expiryTime = Date.now() + 5400000; // Current time + duration in milliseconds
+  //   localStorage.setItem("access_token", token);
+  //   localStorage.setItem("token_expiry", expiryTime.toString());
+  // };
   
   // Check if token is expired
   export const isTokenExpired = () => {
@@ -43,3 +65,23 @@ export const handleLogout = (
       window.dispatchEvent(new Event("storage"));
     }
   };
+
+  export function getPaymentStatusFromCache() {
+  const paymentStatusRaw = localStorage.getItem("payment_status");
+  if (!paymentStatusRaw) {
+    return { status: null, expiredStatus: null, plan_id: null };
+  }
+  try {
+    const paymentStatus = JSON.parse(paymentStatusRaw);
+    const status = paymentStatus.status || null;
+    const plan_id = paymentStatus.plan_id || null;
+    let expiredStatus = null;
+    if (paymentStatus.expiry_date) {
+      const expiryTime = new Date(paymentStatus.expiry_date).getTime();
+      expiredStatus = Date.now() > expiryTime;
+    }
+    return { status, expiredStatus, plan_id };
+  } catch {
+    return { status: null, expiredStatus: null, plan_id: null };
+  }
+}
