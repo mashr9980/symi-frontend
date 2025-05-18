@@ -7,6 +7,7 @@ import { Play, ChevronDown, X } from "lucide-react";
 
 const exampleImages = [
   "/assets/examples/symivision.jpg",
+  "/assets/examples/offerstack.jpg",
   "/assets/examples/aftersymi.jpg"  
 ];
 
