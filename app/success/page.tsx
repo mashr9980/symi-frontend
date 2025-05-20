@@ -2,10 +2,17 @@
 
 import FinalCTA from "@/components/FinalCTA";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getPaymentStatusFromCache } from "../../utils/auth";
 
 export default function SuccessPage() {
+  const router = useRouter();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [countdown, setCountdown] = useState(5);
+
   useEffect(() => {
+    // Create confetti effect
     const createConfetti = (delay: number) => {
       setTimeout(() => {
         const confetti = document.createElement("div");
@@ -22,7 +29,43 @@ export default function SuccessPage() {
     createConfetti(0);
     createConfetti(500);
     createConfetti(1000);
-  }, []);
+
+    // Update payment status in cache and redirect to prompt page
+    const updatePaymentAndRedirect = async () => {
+      setIsRedirecting(true);
+      
+      try {
+        // Clear cache to force a refresh
+        localStorage.removeItem("payment_status");
+        
+        // Fetch fresh payment status
+        await getPaymentStatusFromCache();
+        
+        // Start countdown timer
+        const timer = setInterval(() => {
+          setCountdown(prev => {
+            if (prev <= 1) {
+              clearInterval(timer);
+              // Redirect to prompt page after countdown finishes
+              router.push("/prompt");
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+        
+        return () => clearInterval(timer);
+      } catch (error) {
+        console.error("Error updating payment status:", error);
+        // Even if there's an error, we still redirect to prompt after a delay
+        setTimeout(() => {
+          router.push("/prompt");
+        }, 5000);
+      }
+    };
+
+    updatePaymentAndRedirect();
+  }, [router]);
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-tl from-[#8e70f9] via-[#cebcfc] to-[#d4c4fd] px-4 py-12 relative">
@@ -47,34 +90,43 @@ export default function SuccessPage() {
 
           {/* Headline */}
           <h1 className="text-[2rem] font-semibold text-white mb-4">
-            Thank you. Your system is now live.
+            Payment Successful!
           </h1>
 
           {/* Subheadline */}
           <p className="text-[1rem] text-white opacity-80 mb-8">
-            What’s next? Dive deeper into your roadmap.
+            Thank you for your purchase. Your Blueprint is now being activated.
           </p>
+
+          {/* Redirect Message */}
+          <div className="bg-white/10 border border-white/20 rounded-lg p-4 mb-6">
+            <p className="text-white">
+              {isRedirecting ? (
+                <>
+                  <span className="font-semibold">Redirecting to your Blueprint in {countdown} seconds...</span>
+                  <span className="block mt-2 text-sm opacity-80">You'll be automatically redirected to your Blueprint prompt.</span>
+                </>
+              ) : (
+                "Preparing your Blueprint..."
+              )}
+            </p>
+          </div>
 
           {/* Blueprint ID */}
           <p className="text-sm font-mono text-white mb-6">
-            Blueprint ID: SYMI-583920
+            Transaction ID: {Math.random().toString(36).substring(2, 10).toUpperCase()}
           </p>
 
           {/* CTA Button */}
           <div className="mt-8">
             <Link
-              href="/"
+              href="/prompt"
               className="inline-block rounded-full px-6 py-3 bg-amber-500 text-white shadow hover:scale-105 transition"
             >
-              Back to Home
+              Go to Blueprint Now
             </Link>
           </div>
         </div>
-      </div>
-
-      {/* FinalCTA Positioned at the Bottom */}
-      <div className="absolute bottom-4 w-full">
-        <FinalCTA />
       </div>
     </main>
   );

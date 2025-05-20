@@ -1,27 +1,26 @@
 import config from "../config"; // Make sure config is imported
 
-
 export const handleLogout = (
-    router: ReturnType<typeof import("next/navigation").useRouter>, // Accept the router object
-    setIsLoggedIn?: (value: boolean) => void,
-    setIsAdmin?: (value: boolean) => void
-  ) => {
-    // Clear localStorage and redirect to login page
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user_role");
-    localStorage.removeItem("token_expiry");
-    localStorage.removeItem("payment_status");
-  
-    if (setIsLoggedIn) setIsLoggedIn(false);
-    if (setIsAdmin) setIsAdmin(false);
-  
-    router.push("/auth/login");
-  
-    // Trigger the `storage` event manually to update other tabs
-    window.dispatchEvent(new Event("storage"));
-  };
+  router: ReturnType<typeof import("next/navigation").useRouter>, // Accept the router object
+  setIsLoggedIn?: (value: boolean) => void,
+  setIsAdmin?: (value: boolean) => void
+) => {
+  // Clear localStorage and redirect to login page
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("user_role");
+  localStorage.removeItem("token_expiry");
+  localStorage.removeItem("payment_status");
 
-  // Save token with expiry
+  if (setIsLoggedIn) setIsLoggedIn(false);
+  if (setIsAdmin) setIsAdmin(false);
+
+  router.push("/auth/login");
+
+  // Trigger the `storage` event manually to update other tabs
+  window.dispatchEvent(new Event("storage"));
+};
+
+// Save token with expiry
 export const saveTokenWithExpiry = async (token: string) => {
   const expiryTime = Date.now() + 5400000; // Current time + duration in milliseconds
   localStorage.setItem("access_token", token);
@@ -40,82 +39,99 @@ export const saveTokenWithExpiry = async (token: string) => {
   }
 };
 
-  // export const saveTokenWithExpiry = (token: string) => {
-  //   const expiryTime = Date.now() + 5400000; // Current time + duration in milliseconds
-  //   localStorage.setItem("access_token", token);
-  //   localStorage.setItem("token_expiry", expiryTime.toString());
-  // };
-  
-  // Check if token is expired
-  export const isTokenExpired = () => {
-    const expiryTime = localStorage.getItem("token_expiry");
-    if (!expiryTime) return true; // No expiry time means token is invalid
-    if(Date.now() > parseInt(expiryTime, 10)) {
-      console.log("Token expired",parseInt(expiryTime, 10), Date.now());
-      return true; // Token is expired
-      }
-  };
-  
-  // Clear token if expired
-  export const clearTokenIfExpired = () => {
-    if (isTokenExpired()) {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("token_expiry");
-      localStorage.removeItem("user_role");
-      window.dispatchEvent(new Event("storage"));
-    }
-  };
+// Check if token is expired
+export const isTokenExpired = () => {
+  const expiryTime = localStorage.getItem("token_expiry");
+  if (!expiryTime) return true; // No expiry time means token is invalid
+  return Date.now() > parseInt(expiryTime, 10);
+};
 
-  export async function getPaymentStatusFromCache() {
-  let paymentStatusRaw = localStorage.getItem("payment_status");
+// Clear token if expired
+export const clearTokenIfExpired = () => {
+  if (isTokenExpired()) {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("token_expiry");
+    localStorage.removeItem("user_role");
+    window.dispatchEvent(new Event("storage"));
+  }
+};
 
-  // If not in cache, return nulls
-  if (!paymentStatusRaw) {
+export async function getPaymentStatusFromCache() {
+  // Always try to fetch fresh payment status
+  const accessToken = localStorage.getItem("access_token");
+  
+  if (!accessToken) {
     return { status: null, expiredStatus: null, plan_id: null };
   }
-
+  
   try {
-    let paymentStatus = JSON.parse(paymentStatusRaw);
-
-    // If status is "free", fetch from API and update cache
-    if (paymentStatus.status === "free") {
+    // First check if we already have cached payment status
+    let paymentStatusRaw = localStorage.getItem("payment_status");
+    let cachedPaymentStatus = null;
+    
+    if (paymentStatusRaw) {
       try {
-        const accessToken = localStorage.getItem("access_token");
-        if (!accessToken) {
-          return { status: null, expiredStatus: null, plan_id: null };
-        }
-        const response = await fetch(`${config.apiBaseUrl}/payment/status?token=${accessToken}`);
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem("payment_status", JSON.stringify(data));
-          paymentStatus = data;
-        } else {
-          return { status: null, expiredStatus: null, plan_id: null };
-        }
-      } catch {
-        return { status: null, expiredStatus: null, plan_id: null };
+        cachedPaymentStatus = JSON.parse(paymentStatusRaw);
+      } catch (error) {
+        // Invalid JSON in cache, will fetch fresh data
       }
     }
-
-    const status = paymentStatus.status || null;
-    const plan_id = paymentStatus.plan_id || null;
-    let expiredStatus = null;
-    if (paymentStatus.expiry_date) {
-      const expiryTime = new Date(paymentStatus.expiry_date).getTime();
-      expiredStatus = Date.now() > expiryTime;
+    
+    // If we need to fetch fresh data (no cache or expired)
+    if (!cachedPaymentStatus || 
+        cachedPaymentStatus.status === "free" || 
+        !cachedPaymentStatus.expiry_date) {
+      
+      // Fetch fresh data
+      const response = await fetch(`${config.apiBaseUrl}/payment/status?token=${accessToken}`);
+      
+      if (response.ok) {
+        const freshData = await response.json();
+        
+        // Update cache with fresh data
+        localStorage.setItem("payment_status", JSON.stringify(freshData));
+        
+        // Return processed fresh data
+        const status = freshData.status || null;
+        const plan_id = freshData.plan_id || null;
+        let expiredStatus = null;
+        
+        if (freshData.expiry_date) {
+          const expiryTime = new Date(freshData.expiry_date).getTime();
+          expiredStatus = Date.now() > expiryTime;
+        }
+        
+        return { status, expiredStatus, plan_id };
+      } else {
+        // API error, clear cache
+        localStorage.removeItem("payment_status");
+        return { status: null, expiredStatus: null, plan_id: null };
+      }
+    } else {
+      // Use cached data
+      const status = cachedPaymentStatus.status || null;
+      const plan_id = cachedPaymentStatus.plan_id || null;
+      let expiredStatus = null;
+      
+      if (cachedPaymentStatus.expiry_date) {
+        const expiryTime = new Date(cachedPaymentStatus.expiry_date).getTime();
+        expiredStatus = Date.now() > expiryTime;
+      }
+      
+      return { status, expiredStatus, plan_id };
     }
-    return { status, expiredStatus, plan_id };
-  } catch {
+  } catch (error) {
+    console.error("Error getting payment status:", error);
     return { status: null, expiredStatus: null, plan_id: null };
   }
 }
 
-  export async function getPaymentStatus() {
+export async function getPaymentStatus() {
   const { status } = await getPaymentStatusFromCache();
   return status;
 }
 
-  export function hasChatHistory()  {
+export function hasChatHistory() {
   if (typeof window === "undefined") return false;
   try {
     const chat = localStorage.getItem("symi_hero_chat");
@@ -123,5 +139,4 @@ export const saveTokenWithExpiry = async (token: string) => {
   } catch {
     return false;
   }
-};
-
+}

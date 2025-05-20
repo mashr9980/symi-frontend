@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import FinalCTA from "./FinalCTA";
 import { Play, ChevronDown, X } from "lucide-react";
-import { getPaymentStatus } from "../utils/auth"; // Add this import
-import { useRouter } from "next/navigation"; // Add this import
+import { getPaymentStatusFromCache } from "../utils/auth";
+import { useRouter } from "next/navigation";
 
 const exampleImages = [
   "/assets/examples/symivision.jpg",
@@ -17,16 +17,37 @@ export default function BlueprintV2() {
   // Popup state
   const [showPopup, setShowPopup] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
- const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
- const handleStartBlueprint = async () => {
-  const payment = await getPaymentStatus();
-  if (payment && payment.status === "premium") {
-    router.push("/prompt");
-  } else {
-    router.push("/pricing");
-  }
-};
+  // Check payment status on component mount
+  useEffect(() => {
+    // No automatic redirect here - just let users view the blueprint page
+  }, []);
+
+  const handleStartBlueprint = async () => {
+    setIsLoading(true);
+    try {
+      // Clear payment status to force fresh check
+      localStorage.removeItem("payment_status");
+      
+      const { status, expiredStatus } = await getPaymentStatusFromCache();
+      
+      // If premium and not expired, go to prompt page
+      if (status === "premium" && expiredStatus === false) {
+        router.push("/prompt");
+      } else {
+        // Not premium or expired, go to pricing
+        router.push("/pricing");
+      }
+    } catch (error) {
+      console.error("Error checking payment status:", error);
+      // Default to pricing page if there's an error
+      router.push("/pricing");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Optional scroll effect on flow steps
   useEffect(() => {
@@ -90,9 +111,24 @@ export default function BlueprintV2() {
           <button
             type="button"
             onClick={handleStartBlueprint}
-            className="border-2 bg-[#5212ff] text-white px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse"
+            disabled={isLoading}
+            className={`border-2 bg-[#5212ff] text-white px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse ${
+              isLoading ? "opacity-80" : ""
+            }`}
           >
-            Start with Blueprint
+            {isLoading ? (
+              <>
+                <span className="opacity-0">Start with Blueprint</span>
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </span>
+              </>
+            ) : (
+              "Start with Blueprint"
+            )}
           </button>
 
           {/* <button
@@ -102,8 +138,6 @@ export default function BlueprintV2() {
             Blueprint Vision
           </button> */}
         </div>
-      
-      {/* <FinalCTA /> */}
       </div>
 
       {/* Popup with auto-scrolling image carousel */}
@@ -126,9 +160,6 @@ export default function BlueprintV2() {
                 alt={`Example ${currentIndex + 1}`}
                 className="w-full h-[32rem] object-contain rounded-xl mb-4 transition-all duration-500"
               />
-              {/* <div className="text-gray-700 font-medium mt-2 text-lg">
-                {currentIndex + 1} / {exampleImages.length}
-              </div> */}
             </div>
           </div>
         </div>
