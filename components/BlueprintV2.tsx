@@ -19,8 +19,8 @@ export default function BlueprintV2() {
   const [currentIndex, setCurrentIndex] = useState(0);
  const router = useRouter();
 
- const handleStartBlueprint = () => {
-  const payment = getPaymentStatus();
+ const handleStartBlueprint = async () => {
+  const payment = await getPaymentStatus();
   if (payment && payment.status === "premium") {
     router.push("/prompt");
   } else {

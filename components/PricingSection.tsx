@@ -15,18 +15,22 @@ export default function PricingSection() {
   const [activePlanId, setActivePlanId] = useState<number | null>(null);
   const [isPremium, setIsPremium] = useState(false);
 
-  useEffect(() => {
-  const role = localStorage.getItem("user_role");
-  setUserRole(role);
+ useEffect(() => {
+  const fetchPaymentStatus = async () => {
+    const role = localStorage.getItem("user_role");
+    setUserRole(role);
 
-  // Use getPaymentStatusFromCache to get payment status, plan_id, and premium status
-  const { status, plan_id } = getPaymentStatusFromCache ? getPaymentStatusFromCache() : { status: null, plan_id: null };
-  if (plan_id) {
-    setActivePlanId(Number(plan_id)); // Ensure number type
-  } else {
-    setActivePlanId(null);
-  }
-  setIsPremium(status === "premium");
+    // Await the async function and destructure the result
+    const { status, plan_id } = await getPaymentStatusFromCache();
+    if (plan_id) {
+      setActivePlanId(Number(plan_id)); // Ensure number type
+    } else {
+      setActivePlanId(null);
+    }
+    setIsPremium(status === "premium");
+  };
+
+  fetchPaymentStatus();
 }, []);
 
   useEffect(() => {

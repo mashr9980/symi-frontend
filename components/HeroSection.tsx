@@ -20,7 +20,7 @@ export default function HeroSection() {
   const [chatHistory, setChatHistory] = useState<{ user: string; ai: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [trialExpired, setTrialExpired] = useState(false);
-
+  const [paymentData, setPaymentData] = useState<{ status: string | null, expiredStatus: boolean | null }>({ status: null, expiredStatus: null });
   const router = useRouter();
 
   // WebSocket ref
@@ -44,27 +44,29 @@ export default function HeroSection() {
           setChatHistory(parsed);
 
           // --- Check payment status on page load if chatHistory exists ---
-          const paymentData = getPaymentStatusFromCache ? getPaymentStatusFromCache() : { status: null, expiredStatus: null };
-          const status = paymentData?.status;
-          const expiredStatus = paymentData?.expiredStatus;
-          
-          const userRole = getUserRole();
-          // Only redirect if NOT admin
-          if (userRole !== "admin") {
+          (async () => {
+            const paymentData = await getPaymentStatusFromCache();
+            setPaymentData(paymentData);
 
-          if (status === "premium" && expiredStatus === false) {
-            router.replace("/blueprint");
-            return;
-          } else if (status !== "premium" || expiredStatus === true) {
-            router.replace("/pricing");
-            return;
-          }
-        
-          // Only show popup if not logged in or is admin
-          setHasAskedSecondQuestion(true);
-          setTrialExpired(true);
-          return;
-        }
+            const status = paymentData?.status;
+            const expiredStatus = paymentData?.expiredStatus;
+
+            const userRole = getUserRole();
+            // Only redirect if NOT admin
+            if (userRole !== "admin") {
+              if (status === "premium" && expiredStatus === false) {
+                router.replace("/blueprint");
+                return;
+              } else if (status !== "premium" || expiredStatus === true) {
+                router.replace("/pricing");
+                return;
+              }
+              // Only show popup if not logged in or is admin
+              setHasAskedSecondQuestion(true);
+              setTrialExpired(true);
+              return;
+            }
+          })();
         }
       } catch {
         // ignore
@@ -102,27 +104,26 @@ export default function HeroSection() {
     // If first chat is done and user tries to send again
     if (chatHistory.length > 0) {
       // 1. Check payment status from cache
-      const paymentData = getPaymentStatusFromCache ? getPaymentStatusFromCache() : { status: null, expiredStatus: null };
+      const paymentData = await getPaymentStatusFromCache();
+      setPaymentData(paymentData);
       const status = paymentData?.status;
       const expiredStatus = paymentData?.expiredStatus;
-      
-      const userRole = getUserRole();
-          // Only redirect if NOT admin
-          if (userRole !== "admin") {
 
-      if (status === "premium" && expiredStatus === false) {
-        router.replace("/blueprint");
-        return;
-      } else if (status !== "premium" || expiredStatus === true) {
-        router.replace("/pricing");
-        return;
+      const userRole = getUserRole();
+      // Only redirect if NOT admin
+      if (userRole !== "admin") {
+        if (status === "premium" && expiredStatus === false) {
+          router.replace("/blueprint");
+          return;
+        } else if (status !== "premium" || expiredStatus === true) {
+          router.replace("/pricing");
+          return;
+        }
       }
-    }
       // Only show popup if not logged in or is admin
       setHasAskedSecondQuestion(true);
       setTrialExpired(true);
       return;
-    
     }
 
     setLoading(true);
@@ -270,30 +271,30 @@ export default function HeroSection() {
 
       {/* Trial Expired Popup */}
       {trialExpired && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 text-gray-700 dark:text-gray-300">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
-      <h2 className="text-xl font-semibold mb-4">Trial Expired</h2>
-      <p className="mb-6">
-        Your trial period has ended. If you want to proceed, please log in.
-      </p>
-      {getUserRole() === "admin" ? (
-        <button
-          onClick={() => setTrialExpired(false)}
-          className="px-6 py-2 bg-gray-400 text-white rounded-md font-semibold"
-        >
-          Close
-        </button>
-      ) : (
-        <button
-          onClick={() => router.push("/auth/login")}
-          className="px-6 py-2 bg-indigo-600 text-white rounded-md font-semibold"
-        >
-          Login
-        </button>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 text-gray-700 dark:text-gray-300">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+            <h2 className="text-xl font-semibold mb-4">Trial Expired</h2>
+            <p className="mb-6">
+              Your trial period has ended. If you want to proceed, please log in.
+            </p>
+            {getUserRole() === "admin" ? (
+              <button
+                onClick={() => setTrialExpired(false)}
+                className="px-6 py-2 bg-gray-400 text-white rounded-md font-semibold"
+              >
+                Close
+              </button>
+            ) : (
+              <button
+                onClick={() => router.push("/auth/login")}
+                className="px-6 py-2 bg-indigo-600 text-white rounded-md font-semibold"
+              >
+                Login
+              </button>
+            )}
+          </div>
+        </div>
       )}
-    </div>
-  </div>
-)}
     </div>
   );
 }

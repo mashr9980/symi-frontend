@@ -27,20 +27,22 @@ export default function PromptSection() {
   }, [router]);
 
 // Check payment status before allowing access
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const paymentData = getPaymentStatusFromCache ? getPaymentStatusFromCache() : { status: null, expiredStatus: null };
-    const status = paymentData?.status;
-    const expiredStatus = paymentData?.expiredStatus;
-    
+useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  const checkPaymentStatus = async () => {
+    const { status, expiredStatus } = await getPaymentStatusFromCache();
     if (status === "premium" && expiredStatus === false) {
-      //router.replace("/prompt");
-      //return;
+      // router.replace("/prompt");
+      // return;
     } else {
       router.replace("/pricing");
     }
     // else continue as normal
-  }, [router]);
+  };
+
+  checkPaymentStatus();
+}, [router]);
 
   // Handle user input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -66,13 +66,37 @@ export const saveTokenWithExpiry = async (token: string) => {
     }
   };
 
-  export function getPaymentStatusFromCache() {
-  const paymentStatusRaw = localStorage.getItem("payment_status");
+  export async function getPaymentStatusFromCache() {
+  let paymentStatusRaw = localStorage.getItem("payment_status");
+
+  // If not in cache, return nulls
   if (!paymentStatusRaw) {
     return { status: null, expiredStatus: null, plan_id: null };
   }
+
   try {
-    const paymentStatus = JSON.parse(paymentStatusRaw);
+    let paymentStatus = JSON.parse(paymentStatusRaw);
+
+    // If status is "free", fetch from API and update cache
+    if (paymentStatus.status === "free") {
+      try {
+        const accessToken = localStorage.getItem("access_token");
+        if (!accessToken) {
+          return { status: null, expiredStatus: null, plan_id: null };
+        }
+        const response = await fetch(`${config.apiBaseUrl}/payment/status?token=${accessToken}`);
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem("payment_status", JSON.stringify(data));
+          paymentStatus = data;
+        } else {
+          return { status: null, expiredStatus: null, plan_id: null };
+        }
+      } catch {
+        return { status: null, expiredStatus: null, plan_id: null };
+      }
+    }
+
     const status = paymentStatus.status || null;
     const plan_id = paymentStatus.plan_id || null;
     let expiredStatus = null;
@@ -86,15 +110,10 @@ export const saveTokenWithExpiry = async (token: string) => {
   }
 }
 
-  export function getPaymentStatus() {
-    if (typeof window === "undefined") return null;
-    try {
-      const data = localStorage.getItem("payment_status");
-      return data ? JSON.parse(data) : null;
-    } catch {
-      return null;
-    }
-  }
+  export async function getPaymentStatus() {
+  const { status } = await getPaymentStatusFromCache();
+  return status;
+}
 
   export function hasChatHistory()  {
   if (typeof window === "undefined") return false;
