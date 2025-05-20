@@ -90,17 +90,17 @@ export default function BlueprintV2() {
           <button
             type="button"
             onClick={handleStartBlueprint}
-            className="bg-black text-white px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse"
+            className="border-2 bg-[#5212ff] text-white px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse"
           >
             Start with Blueprint
           </button>
 
-          <button
+          {/* <button
             className="border-2 bg-[#5212ff] text-white px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse"
             onClick={() => setShowPopup(true)}
           >
             Blueprint Vision
-          </button>
+          </button> */}
         </div>
       
       {/* <FinalCTA /> */}

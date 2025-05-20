@@ -19,8 +19,6 @@ function Navbar() {
     { label: "Blueprint", href: "/blueprint" },
     { label: "System Builder", href: "/system-builder" },
     { label: "Pricing", href: "/pricing" },
-    { label: "FAQ", href: "/faq" }, 
-    { label: "Manifesto", href: "/manifesto" },
     { label: "SYMI Lab", href: "/symi-lab" }, // <-- Add this line
   ];
   

@@ -5,44 +5,80 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Head from "next/head";
 
-// Sample project data - you can replace this with actual data later
+// Project data
 const projects = [
   {
     id: 1,
-    title: "Neural Scheduler",
-    description: "An AI-powered scheduling system that adapts to your workflow patterns and optimizes your calendar automatically.",
-    status: "experimental",
-    image: "/assets/icons/cc18.png",
-    link: "#neural-scheduler"
+    title: "ECHO FRAMEWORK",
+    description: "The Logic of Listening: Introducing the Echo Framework",
+    status: "Blueprint",
+    releaseWave: "Phase II – Fractal Bloom (Q3 2025)",
+    image: "/assets/icons/cc11.png",
+    overview: `In the architecture of SYMI, no system is meant to live in isolation.
+The Echo Framework is our response to fragmentation — a protocol that lets systems speak to each other through resonance, not rigidity.
+Most automations are chains.
+Echo is a circle.
+It allows agents, dashboards, user data, and client journeys to evolve modularly but synchronously — not through brittle integrations, but by inheriting rhythm from one another.`,
+    vision: `Echo is the spine of a recursive enterprise.
+• A coach launches a system → Echo reflects it across client onboarding, content, and follow-up.
+• A professor creates a course → Echo auto-aligns payments, access, and feedback.
+• An artist uploads a release → Echo links storefront, email drop, and collector agent.
+Echo is not an API. It's a memory field.
+It doesn't just connect — it remembers, learns, and adapts.`,
+    currentPhase: `→ Core architecture drafted
+→ Recursive signal routing tested in isolated builds
+→ Awaiting release in Operator Circle for full-field resonance tests`,
+    whyItMatters: `SYMI isn't just here to automate.
+It's here to make digital systems feel like organs —
+coherent, alive, and listening to each other.
+Echo is how they listen.`
   },
   {
     id: 2,
-    title: "Echo Framework",
-    description: "A modular architecture for connecting business systems with minimal integration overhead.",
-    status: "blueprint",
-    image: "/assets/icons/cc11.png",
-    link: "#echo-framework"
-  },
-  {
-    id: 3,
-    title: "Quantum Responder",
-    description: "Client engagement platform that learns from every interaction to provide increasingly relevant responses.",
-    status: "development",
-    image: "/assets/icons/cc23.png",
-    link: "#quantum-responder"
-  },
-  {
-    id: 4,
-    title: "Synthesis Engine",
-    description: "Data transformation protocol that converts unstructured information into actionable business intelligence.",
-    status: "blueprint",
+    title: "SYNTHESIS ENGINE",
+    description: "From Noise to Intelligence: The Synthesis Engine",
+    status: "Blueprint",
+    releaseWave: "Phase I – Recursive Economy Activation (Q2–Q3 2025)",
     image: "/assets/icons/cc20.png",
-    link: "#synthesis-engine"
+    overview: `Synthesis Engine is SYMI's internal alchemist.
+Its purpose: convert unstructured reality into structured intelligence.
+You give it:
+• Raw text
+• Fragments of ideas
+• Testimonials
+• Sales calls
+• Journals
+• Logs
+• Voice notes
+It returns:
+• Actionable insights
+• Structured blueprints
+• New agent behaviors
+• Recurring content models
+• Automatable processes`,
+    vision: `Everyone holds gold in their noise.
+Synthesis Engine is built to detect semantic patterns hidden in the chaos — and mirror them back as business logic.
+It's GPT with memory.
+Not just words — but structure, rhythm, application.
+Imagine:
+• Upload a 20-min client rant → get a new product structure
+• Drop in 3 DMs → get a viral sequence plan
+• Feed in 5 conversations → get a new AI agent pre-configured`,
+    philosophy: `The world is not short on information.
+It's short on transmutation.
+SYMI's Synthesis Engine is here to distill signal from story.`,
+    currentPhase: `→ Logic core designed
+→ Data transformation protocols live in internal alpha
+→ Integration with blueprint builder planned in Fractal Expansion Pack`,
+    whyItMatters: `SYMI doesn't just build with input.
+It evolves from everything you've ever said, tried, or felt —
+and turns that into intelligence that grows with you.
+Synthesis is how you remember what you already knew.`
   }
 ];
 
 export default function SymiLab() {
-  const [hoveredProject, setHoveredProject] = useState<number | null>(null);
+  const [activeProject, setActiveProject] = useState<number | null>(null);
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-white via-purple-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900/30">
@@ -129,8 +165,7 @@ export default function SymiLab() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 + idx * 0.1 }}
-                onMouseEnter={() => setHoveredProject(project.id)}
-                onMouseLeave={() => setHoveredProject(null)}
+                onClick={() => setActiveProject(activeProject === project.id ? null : project.id)}
                 whileHover={{ 
                   y: -5,
                   transition: { duration: 0.2 }
@@ -140,7 +175,7 @@ export default function SymiLab() {
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-blue-500/20 mix-blend-overlay" />
                   <div className="bg-gradient-to-br from-purple-100 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/20 p-6 flex justify-center items-center h-48">
                     <div className="relative w-24 h-24">
-                      <div className={`absolute inset-0 bg-purple-500/20 rounded-full blur-xl transition-opacity duration-300 ${hoveredProject === project.id ? 'opacity-100' : 'opacity-40'}`} />
+                      <div className={`absolute inset-0 bg-purple-500/20 rounded-full blur-xl transition-opacity duration-300 ${activeProject === project.id ? 'opacity-100' : 'opacity-40'}`} />
                       <img 
                         src={project.image} 
                         alt={project.title} 
@@ -149,28 +184,67 @@ export default function SymiLab() {
                     </div>
                   </div>
                   <div className="absolute top-4 right-4">
-                    <span className={`text-xs px-3 py-1 rounded-full font-medium ${
-                      project.status === 'experimental' ? 'bg-amber-100 text-amber-800' :
-                      project.status === 'blueprint' ? 'bg-blue-100 text-blue-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
-                      {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                    <span className="text-xs px-3 py-1 rounded-full font-medium bg-amber-100 text-amber-800">
+                      {project.status}
                     </span>
                   </div>
                 </div>
                 
                 <div className="p-6">
+                  <div className="mb-2 text-sm text-indigo-600 dark:text-indigo-400">
+                    {project.releaseWave}
+                  </div>
                   <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{project.title}</h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">{project.description}</p>
-                  <Link 
-                    href={project.link}
-                    className="inline-flex items-center text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+                  
+                  {activeProject === project.id && (
+                    <motion.div 
+                      className="mt-6 space-y-6"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div>
+                        <h4 className="text-md font-semibold mb-2 text-gray-800 dark:text-gray-200">Overview</h4>
+                        <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line text-sm">{project.overview}</p>
+                      </div>
+                      
+                      <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                        <h4 className="text-md font-semibold mb-2 text-gray-800 dark:text-gray-200">
+                          {project.id === 1 ? 'Vision' : 'Vision'}
+                        </h4>
+                        <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line text-sm">{project.vision}</p>
+                      </div>
+                      
+                      {project.id === 2 && project.philosophy && (
+                        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                          <h4 className="text-md font-semibold mb-2 text-gray-800 dark:text-gray-200">Philosophy</h4>
+                          <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line text-sm">{project.philosophy}</p>
+                        </div>
+                      )}
+                      
+                      <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                        <h4 className="text-md font-semibold mb-2 text-gray-800 dark:text-gray-200">Current Phase</h4>
+                        <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line text-sm">{project.currentPhase}</p>
+                      </div>
+                      
+                      <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                        <h4 className="text-md font-semibold mb-2 text-gray-800 dark:text-gray-200">Why It Matters</h4>
+                        <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line text-sm">{project.whyItMatters}</p>
+                      </div>
+                    </motion.div>
+                  )}
+                  
+                  <button 
+                    className="mt-4 inline-flex items-center text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
                   >
-                    Explore project
-                    <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    {activeProject === project.id ? 'Close details' : 'Explore project'}
+                    <svg className={`ml-2 w-4 h-4 transition-transform ${activeProject === project.id ? 'rotate-180' : ''}`} 
+                      fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
-                  </Link>
+                  </button>
                 </div>
               </motion.div>
             ))}
@@ -190,7 +264,7 @@ export default function SymiLab() {
           </p>
           <Link 
             href="/blueprint"
-            className="border-2 bg-[#5212ff] text-white  px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse"
+            className="inline-block bg-[#4C00FF] text-white px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse"
           >
             Start with a Blueprint
           </Link>

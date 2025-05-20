@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, Mail, Linkedin, Twitter } from "lucide-react";
+import { Play, Mail, Linkedin, Twitter, Instagram } from "lucide-react";
 import Link from "next/link";
 import { hasChatHistory } from "../utils/auth";
 
@@ -39,13 +39,9 @@ export default function Footer() {
           <div className="flex flex-col items-center md:items-start">
             <h4 className="text-sm font-semibold text-gray-900 mb-4">Resources</h4>
             <ul className="space-y-2 text-sm text-gray-700">
-              {/* <li><Link href="/blueprint-ready" className="hover:underline">Blueprint Ready</Link></li> */}
-              {/* <li><Link href="/checkout" className="hover:underline">Checkout</Link></li> */}
-              {/* <li><Link href="/success" className="hover:underline">Success</Link></li> */}       
-              {/* <li><Link href="/framework" className="hover:underline">Framework</Link></li> */}
               <li><Link href="/pricing" className="hover:underline">Pricing</Link></li>
-              {/* <li><Link href="/our-vision" className="hover:underline">Our Vision</Link></li> */}
-
+              <li><Link href="/faq" className="hover:underline">FAQ</Link></li>
+              <li><Link href="/manifesto" className="hover:underline">Manifesto</Link></li>
             </ul>
           </div>
 
@@ -58,7 +54,7 @@ export default function Footer() {
             </div>
             <div className="flex gap-3 justify-center md:justify-start">
               <Link
-                href="https://twitter.com"
+                href="https://x.com/symi_io"
                 target="_blank"
                 aria-label="Twitter"
                 className="p-2 bg-white/30 hover:bg-white/50 rounded-full transition"
@@ -66,12 +62,12 @@ export default function Footer() {
                 <Twitter className="w-4 h-4 text-blue-600" />
               </Link>
               <Link
-                href="https://linkedin.com"
+                href="https://www.instagram.com/symi.io"
                 target="_blank"
-                aria-label="LinkedIn"
+                aria-label="instagram"
                 className="p-2 bg-white/30 hover:bg-white/50 rounded-full transition"
               >
-                <Linkedin className="w-4 h-4 text-blue-800" />
+                <Instagram className="w-4 h-4 text-blue-800" />
               </Link>
             </div>
           </div>

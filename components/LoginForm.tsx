@@ -83,29 +83,23 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center bg-gradient-to-tr from-[#f6f2ff] to-[#ebe9ff] text-gray-900 justify-center px-4 py-12 animate__animated animate__fadeIn animate__slow">
-      <Head>
-        <meta charSet="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>SYMI | Login</title>
-      </Head>
-
-      <div className="max-w-md w-full bg-white p-10 rounded-2xl shadow-xl border border-gray-100 text-center space-y-8 pulse-shadow">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#efe2fc] to-white px-4 py-12">
+      <div className="max-w-md w-full bg-white/80 backdrop-blur-md p-10 rounded-3xl shadow-xl border border-purple-100/50 text-center space-y-8">
         {/* SYMI Symbol */}
         <div className="flex justify-center mb-2">
-          <div className="relative w-12 h-12 breathe">
-            <div className="w-full h-full bg-indigo-500 rounded-full"></div>
-            <div className="absolute inset-0 bg-indigo-300 rounded-full blur-xl opacity-30 animate-pulse"></div>
+          <div className="relative w-12 h-12">
+            <div className="w-full h-full bg-[#4C00FF] rounded-full"></div>
+            <div className="absolute inset-0 bg-[#4C00FF]/30 rounded-full blur-xl opacity-50 animate-pulse"></div>
           </div>
         </div>
 
         {/* Title */}
         <div>
           <h1 className="text-3xl font-semibold text-gray-900">
-            Welcome to SYMI
+            Welcome Back
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Access your personalized system
+          <p className="text-sm text-gray-500 mt-2">
+            Log in to your SYMI account
           </p>
         </div>
 
@@ -115,71 +109,65 @@ export default function LoginForm() {
           onSubmit={handleSubmit}
           className="space-y-6"
         >
-          <div className="float-label-input">
+          <div className="relative">
             <input
               type="email"
               name="email"
               id="email"
-              placeholder=" "
               required
               pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
               title="Enter a valid email"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm input-focus-effect focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 border border-purple-200 rounded-xl text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 focus:border-[#4C00FF] transition-all"
+              placeholder="Email address"
             />
-            <label htmlFor="email">Your email address</label>
           </div>
 
-          <div className="float-label-input">
+          <div className="relative">
             <input
               type="password"
               name="password"
               id="password"
-              placeholder=" "
               required
               title="Enter your password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm input-focus-effect focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 border border-purple-200 rounded-xl text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 focus:border-[#4C00FF] transition-all"
+              placeholder="Password"
             />
-            <label htmlFor="password">Your password</label>
           </div>
 
           <button
             type="submit"
-            className={`w-full gradient-btn text-white py-3 rounded-lg font-medium transition ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
+            className={`w-full bg-[#4C00FF] text-white py-3 rounded-xl font-medium hover:bg-[#4200e6] transition-all transform hover:scale-[1.02] active:scale-[0.98] ${
+              loading ? "opacity-70 cursor-wait" : ""
             }`}
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Log In"}
+            {loading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Logging in...
+              </span>
+            ) : (
+              "Log In"
+            )}
           </button>
         </form>
 
         {/* Divider */}
-        <div className="flex items-center justify-center gap-3 text-gray-400 text-sm py-2">
+        <div className="flex items-center justify-center gap-3 text-gray-400 text-sm">
           <span className="border-t border-gray-200 w-1/4"></span>
           <span className="text-xs uppercase tracking-wider">or</span>
           <span className="border-t border-gray-200 w-1/4"></span>
         </div>
 
-        {/* Google Sign-in
-        <a
-           onClick={handleGoogleSignIn}
-           target="_blank"
-          className="w-full flex items-center justify-center border border-gray-300 py-3 rounded-lg text-sm font-medium hover:bg-gray-50 transition transform hover:-translate-y-1 hover:shadow-md"
-        >
-          <img
-            src="https://www.svgrepo.com/show/355037/google.svg"
-            alt="Google"
-            className="w-5 h-5 mr-2"
-          />
-          Sign in with Google
-        </a> */}
-
         {/* Sign Up Option */}
-        <div className="text-sm text-gray-500 pt-6">
+        <div className="text-sm text-gray-500">
           Don't have an account?{" "}
           <Link
             href="/auth/signup"
-            className="text-indigo-500 hover:text-indigo-600 underline"
+            className="text-[#4C00FF] hover:text-[#4200e6] font-medium"
           >
             Sign Up
           </Link>
@@ -190,23 +178,16 @@ export default function LoginForm() {
           By continuing, you agree to our
           <a
             href="#"
-            className="text-indigo-500 hover:text-indigo-600 underline"
+            className="text-[#4C00FF] hover:text-[#4200e6] mx-1"
           >
             Terms
           </a>
-          <span className="mx-1">and</span>
+          and
           <a
             href="#"
-            className="text-indigo-500 hover:text-indigo-600 underline"
+            className="text-[#4C00FF] hover:text-[#4200e6] mx-1"
           >
             Privacy Policy
-          </a>
-          .
-        </div>
-
-        <div className="pt-4">
-          <a href="#" className="text-xs text-indigo-500 hover:text-indigo-600">
-            Need help signing in?
           </a>
         </div>
       </div>
