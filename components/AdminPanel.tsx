@@ -39,6 +39,7 @@ const AdminPanel = () => {
     features: [""],
     is_active: true,
     display_order: 0,
+    price_per_month: 0,
   }); // State for new plan
   const [professionPrompts, setProfessionPrompts] = useState<any[]>([]); // State to store profession prompts
   const [loadingProfessionPrompts, setLoadingProfessionPrompts] = useState(false); // Loading state for profession prompts
@@ -53,6 +54,8 @@ const AdminPanel = () => {
     features: [""],
     is_active: true,
     display_order: 0,
+    image: "",
+    price_per_month: 0,
   }); // State for updated plan
   const [loadingChat, setLoadingChat] = useState(false); // State for chat loading
   const [loadingChatUserId, setLoadingChatUserId] = useState<number | null>(null); // Track the user ID for loading
@@ -1420,10 +1423,30 @@ const deleteProfessionPrompt = async (promptId: number) => {
         onClick={() => setAddPlanModal(false)}
       >
         <div
-          className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md text-gray-700 dark:text-gray-300"
+          className="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg h-[90vh] overflow-y-auto text-gray-700 dark:text-gray-300"
           onClick={(e) => e.stopPropagation()}
+          style={{ minWidth: 350, maxWidth: 500, minHeight: 400 }}
         >
           <h2 className="text-lg font-semibold mb-4">Add New Plan</h2>
+          
+          {/* Image selection */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Plan Image</label>
+            <div className="flex flex-wrap gap-3">
+              {(config.planImages || []).map((img: string) => (
+                <button
+                  type="button"
+                  key={img}
+                  className={`border rounded-lg p-1 ${updatedPlan.image === img ? "border-indigo-600 ring-2 ring-indigo-300" : "border-gray-200"}`}
+                  onClick={() => setUpdatedPlan({ ...updatedPlan, image: img })}
+                  aria-label="Select plan image"
+                >
+                  <img src={img} alt="plan" className="w-12 h-12 object-contain" />
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Name</label>
             <input
@@ -1434,6 +1457,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
               placeholder="Enter plan name"
             />
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Description</label>
             <textarea
@@ -1443,6 +1467,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
               placeholder="Enter plan description"
             />
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Price</label>
             <input
@@ -1453,6 +1478,18 @@ const deleteProfessionPrompt = async (promptId: number) => {
               placeholder="Enter plan price"
             />
           </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Price Per Month</label>
+            <input
+              type="number"
+              value={newPlan.price_per_month || ""}
+              onChange={(e) => setNewPlan({ ...newPlan, price_per_month: parseFloat(e.target.value) })}
+              className="w-full border px-4 py-2 rounded"
+              placeholder="Enter price per month"
+            />
+          </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Currency</label>
             <select
@@ -1464,6 +1501,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
               <option value="EUR">EUR</option>
             </select>
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Duration (Days)</label>
             <input
@@ -1474,20 +1512,23 @@ const deleteProfessionPrompt = async (promptId: number) => {
               placeholder="Enter duration in days"
             />
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Features</label>
             <textarea
-              value={newPlan.features.join("; ")} // Join features with a semicolon for display
+              value={newPlan.features.join("; ")}
               onChange={(e) =>
                 setNewPlan({
                   ...newPlan,
-                  features: e.target.value.split(";").map((f) => f.trim()), // Split by semicolon and trim whitespace
+                  features: e.target.value.split(";").map((f) => f.trim()),
                 })
               }
               className="w-full border px-4 py-2 rounded"
               placeholder="Enter features separated by semicolons (e.g., Feature 1; Feature 2)"
+              rows={5}
             />
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Status</label>
             <select
@@ -1501,6 +1542,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
               <option value="inactive">Inactive</option>
             </select>
           </div>
+
           <div className="flex justify-end space-x-2">
             <button
               className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
@@ -1525,10 +1567,30 @@ const deleteProfessionPrompt = async (promptId: number) => {
         onClick={() => setEditPlanModal(false)}
       >
         <div
-          className="bg-white p-6 rounded-lg shadow-xl w-[95vw] sm:w-full max-w-md text-gray-700 dark:text-gray-300"
+          className="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg h-[90vh] overflow-y-auto text-gray-700 dark:text-gray-300"
           onClick={(e) => e.stopPropagation()}
+          style={{ minWidth: 350, maxWidth: 500, minHeight: 400 }}
         >
           <h2 className="text-lg font-semibold mb-4">Edit Plan</h2>
+          
+          {/* Image selection */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Plan Image</label>
+            <div className="flex flex-wrap gap-3">
+              {(config.planImages || []).map((img: string) => (
+                <button
+                  type="button"
+                  key={img}
+                  className={`border rounded-lg p-1 ${updatedPlan.image === img ? "border-indigo-600 ring-2 ring-indigo-300" : "border-gray-200"}`}
+                  onClick={() => setUpdatedPlan({ ...updatedPlan, image: img })}
+                  aria-label="Select plan image"
+                >
+                  <img src={img} alt="plan" className="w-12 h-12 object-contain" />
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Name</label>
             <input
@@ -1539,6 +1601,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
               placeholder="Enter plan name"
             />
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Description</label>
             <textarea
@@ -1550,6 +1613,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
               placeholder="Enter plan description"
             />
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Price</label>
             <input
@@ -1560,6 +1624,18 @@ const deleteProfessionPrompt = async (promptId: number) => {
               placeholder="Enter plan price"
             />
           </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Price Per Month</label>
+            <input
+              type="number"
+              value={updatedPlan.price_per_month || ""}
+              onChange={(e) => setUpdatedPlan({ ...updatedPlan, price_per_month: parseFloat(e.target.value) })}
+              className="w-full border px-4 py-2 rounded"
+              placeholder="Enter price per month"
+            />
+          </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Currency</label>
             <select
@@ -1571,6 +1647,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
               <option value="EUR">EUR</option>
             </select>
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Duration (Days)</label>
             <input
@@ -1583,20 +1660,23 @@ const deleteProfessionPrompt = async (promptId: number) => {
               placeholder="Enter duration in days"
             />
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Features</label>
             <textarea
-              value={updatedPlan.features.join("; ")} // Join features with a semicolon for display
+              value={updatedPlan.features.join("; ")}
               onChange={(e) =>
                 setUpdatedPlan({
                   ...updatedPlan,
-                  features: e.target.value.split(";").map((f) => f.trim()), // Split by semicolon and trim whitespace
+                  features: e.target.value.split(";").map((f) => f.trim()),
                 })
               }
               className="w-full border px-4 py-2 rounded"
               placeholder="Enter features separated by semicolons (e.g., Feature 1; Feature 2)"
+              rows={5}
             />
           </div>
+
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Status</label>
             <select
@@ -1610,6 +1690,7 @@ const deleteProfessionPrompt = async (promptId: number) => {
               <option value="inactive">Inactive</option>
             </select>
           </div>
+
           <div className="flex justify-end space-x-2">
             <button
               className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"

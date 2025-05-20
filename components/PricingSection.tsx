@@ -32,19 +32,19 @@ export default function PricingSection() {
   useEffect(() => {
     const fetchPricingPlans = async () => {
       const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) {
-        router.push("/auth/login");
-        return;
-      }
+      // if (!accessToken) {
+      //   router.push("/auth/login");
+      //   return;
+      // }
 
-      if (isTokenExpired()) {
-        handleLogout(router);
-        return;
-      }
+      // if (isTokenExpired()) {
+      //   handleLogout(router);
+      //   return;
+      // }
 
       try {
         const response = await fetch(
-          `${config.apiBaseUrl}/pricing/admin/plans?token=${accessToken}`
+          `${config.apiBaseUrl}/pricing/admin/plans`
         );
 
         if (response.ok) {
@@ -65,9 +65,9 @@ export default function PricingSection() {
     const accessToken = localStorage.getItem("access_token");
     const userEmail = localStorage.getItem("user_email");
     if (!accessToken) {
-      router.push("/auth/login");
-      return;
-    }
+       router.push("/auth/login");
+       return;
+     }
 
     try {
       const response = await fetch(
@@ -116,47 +116,56 @@ export default function PricingSection() {
           {plans.map((plan, index) => (
             <div
               key={index}
-              className={`bg-white/5 backdrop-blur-sm rounded-3xl p-8 shadow-lg max-w-s mx-auto sm:max-w-lg hover:scale-105 hover:translate-y-1 hover:shadow-2xl transition-all duration-200 active:scale-95
+              className={`flex flex-col bg-white/5 backdrop-blur-sm rounded-3xl p-8 shadow-lg max-w-s mx-auto sm:max-w-lg hover:scale-105 hover:translate-y-1 hover:shadow-2xl transition-all duration-200 active:scale-95
                 ${activePlanId === Number(plan.id) && isPremium ? "border-4 border-indigo-600" : ""}`}
-              style={{ width: "375px", height: "500px" }}
+              style={{ width: "375px", height: "550px" }}
             >
-              <div className="mb-6 text-center">
-                <div className="w-16 h-16 mb-4 mx-auto">
-                  <img
-                    src="/assets/icons/cc7.png"
-                    alt={plan.name}
-                  />
+              <div className="flex-1 flex flex-col">
+                <div className="mb-6 text-center">
+                  <div className="w-16 h-16 mb-4 mx-auto">
+                    <img
+                      src="/assets/icons/cc7.png"
+                      alt={plan.name}
+                    />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-2">{plan.name}</h2>
+                  <p className="text-gray-600">{plan.description}</p>
                 </div>
-                <h2 className="text-2xl font-bold mb-2">{plan.name}</h2>
-                <p className="text-gray-600">{plan.description}</p>
+                <div className="text-4xl font-bold mb-8 text-center">
+                  {plan.currency} {plan.price}
+                </div>
+                <div
+                  className={`space-y-4 mb-8 ${
+                    plan.features.length > 3 ? "overflow-y-auto scroll-on-hover" : ""
+                  }`}
+                  style={plan.features.length > 3 ? { maxHeight: "144px" } : {}}
+                >
+                  {plan.features.map((feature: string, i: number) => (
+                    <FeatureItem key={i} text={feature} />
+                  ))}
+                </div>
+
               </div>
-              <div className="text-4xl font-bold mb-8 text-center">
-                {plan.currency} {plan.price}
-              </div>
-              <div className="space-y-4 mb-8">
-                {plan.features.map((feature: string, i: number) => (
-                  <FeatureItem key={i} text={feature} />
-                ))}
-              </div>
-              {activePlanId === Number(plan.id) && isPremium ? (
-                <div className="w-full flex justify-center items-center py-3">
+              {/* Action area: badge or button always at the bottom inside the card */}
+              <div className="w-full flex justify-center items-center mt-auto">
+                {activePlanId === Number(plan.id) && isPremium ? (
                   <span className="inline-block bg-green-100 text-green-700 px-4 py-2 rounded-xl font-semibold text-lg">
                     Active
                   </span>
-                </div>
-              ) : (
-                <button
-                  onClick={() => handleCheckout(plan.id)}
-                  className={`w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-all ${
-                    userRole === "admin" ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                  disabled={userRole === "admin"}
-                >
-                  Start this Plan
-                </button>
-              )}
+                ) : (
+                  <button
+                    onClick={() => handleCheckout(plan.id)}
+                    className={`w-full bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-all ${
+                      userRole === "admin" ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    disabled={userRole === "admin"}
+                  >
+                    Start this Plan
+                  </button>
+                )}
+              </div>
             </div>
-          ))}
+            ))}
         </div>
 
         {/* Footer */}

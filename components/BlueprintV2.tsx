@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import FinalCTA from "./FinalCTA";
 import { Play, ChevronDown, X } from "lucide-react";
+import { getPaymentStatus } from "../utils/auth"; // Add this import
+import { useRouter } from "next/navigation"; // Add this import
 
 const exampleImages = [
   "/assets/examples/symivision.jpg",
@@ -15,6 +17,16 @@ export default function BlueprintV2() {
   // Popup state
   const [showPopup, setShowPopup] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+ const router = useRouter();
+
+ const handleStartBlueprint = () => {
+  const payment = getPaymentStatus();
+  if (payment && payment.status === "premium") {
+    router.push("/prompt");
+  } else {
+    router.push("/pricing");
+  }
+};
 
   // Optional scroll effect on flow steps
   useEffect(() => {
@@ -75,21 +87,23 @@ export default function BlueprintV2() {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row justify-center items-center gap-6 mt-20 text-center">
-          <Link
-            href="/prompt"
+          <button
+            type="button"
+            onClick={handleStartBlueprint}
             className="bg-black text-white px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse"
           >
             Start with Blueprint
-          </Link>
+          </button>
 
           <button
-            className="border-2 bg-[#5212ff] text-white  px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse"
+            className="border-2 bg-[#5212ff] text-white px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse"
             onClick={() => setShowPopup(true)}
           >
-            View Example
+            Blueprint Vision
           </button>
         </div>
-        {/* <FinalCTA /> */}
+      
+      {/* <FinalCTA /> */}
       </div>
 
       {/* Popup with auto-scrolling image carousel */}

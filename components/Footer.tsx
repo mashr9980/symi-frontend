@@ -2,6 +2,7 @@
 
 import { Play, Mail, Linkedin, Twitter } from "lucide-react";
 import Link from "next/link";
+import { hasChatHistory } from "../utils/auth";
 
 export default function Footer() {
   return (
@@ -25,7 +26,9 @@ export default function Footer() {
           <div className="flex flex-col items-center md:items-start">
             <h4 className="text-sm font-semibold text-gray-900 mb-4">Explore</h4>
             <ul className="space-y-2 text-sm text-gray-700">
-              <li><Link href="/" className="hover:underline">Home</Link></li>
+              <li><Link 
+               href={hasChatHistory() ? "/blueprint" : "/"}
+              className="hover:underline">Home</Link></li>
               {/* <li><Link href="/symi-os" className="hover:underline">SYMI OS</Link></li> */}
               {/* <li><Link href="/about" className="hover:underline">About</Link></li> */}
        
@@ -51,7 +54,7 @@ export default function Footer() {
             <h4 className="text-sm font-semibold text-gray-900 mb-4">Connect</h4>
             <div className="flex items-center gap-2 text-sm text-gray-700 mb-4 justify-center md:justify-start">
               <Mail className="w-5 h-5 text-gray-600" />
-              <span>contact@symi.ai</span>
+              <span>contact@symi.io</span>
             </div>
             <div className="flex gap-3 justify-center md:justify-start">
               <Link

@@ -14,7 +14,7 @@ const FaqPage = () => {
   return (
     <div className="w-full min-h-screen px-4 py-16 sm:py-24 flex flex-col items-center justify-center text-center relative overflow-hidden">
       {/* Gradient background */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-br from-blue-500/20 to-purple-500/30 rounded-3xl blur-3xl pointer-events-none" />
+       <div className="absolute inset-0 bg-gradient-to-br from-[#efe2fc] to-white -z-10"></div>
 
       <motion.div
         className="max-w-3xl w-full space-y-12 z-10"

@@ -1,6 +1,7 @@
 'use client'; // Mark this component as a Client Component
 
 import Head from "next/head";
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation"; // For navigation
 import config from "../config"; // Import the config file for the base URL
@@ -176,12 +177,12 @@ export default function LoginForm() {
         {/* Sign Up Option */}
         <div className="text-sm text-gray-500 pt-6">
           Don't have an account?{" "}
-          <a
+          <Link
             href="/auth/signup"
             className="text-indigo-500 hover:text-indigo-600 underline"
           >
             Sign Up
-          </a>
+          </Link>
         </div>
 
         {/* Footer */}

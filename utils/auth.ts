@@ -85,3 +85,24 @@ export const saveTokenWithExpiry = async (token: string) => {
     return { status: null, expiredStatus: null, plan_id: null };
   }
 }
+
+  export function getPaymentStatus() {
+    if (typeof window === "undefined") return null;
+    try {
+      const data = localStorage.getItem("payment_status");
+      return data ? JSON.parse(data) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  export function hasChatHistory()  {
+  if (typeof window === "undefined") return false;
+  try {
+    const chat = localStorage.getItem("symi_hero_chat");
+    return !!chat;
+  } catch {
+    return false;
+  }
+};
+

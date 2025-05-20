@@ -29,13 +29,16 @@ export default function PromptSection() {
 // Check payment status before allowing access
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const { status, expiredStatus } = getPaymentStatusFromCache ? getPaymentStatusFromCache() : {};
-      if (status === "premium" && expiredStatus === false) {
-        //router.replace("/prompt");
-        //return;
-      }else{
-        router.replace("/pricing");
-      }
+    const paymentData = getPaymentStatusFromCache ? getPaymentStatusFromCache() : { status: null, expiredStatus: null };
+    const status = paymentData?.status;
+    const expiredStatus = paymentData?.expiredStatus;
+    
+    if (status === "premium" && expiredStatus === false) {
+      //router.replace("/prompt");
+      //return;
+    } else {
+      router.replace("/pricing");
+    }
     // else continue as normal
   }, [router]);
 

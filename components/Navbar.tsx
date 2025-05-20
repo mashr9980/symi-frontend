@@ -3,7 +3,7 @@ import React, { useState,useEffect } from "react";
 import { Play } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { isTokenExpired, handleLogout } from "../utils/auth"; // Import utility functions
+import { hasChatHistory, handleLogout } from "../utils/auth"; // Import utility functions
 
 function Navbar() {
   const pathname = usePathname();
@@ -21,6 +21,7 @@ function Navbar() {
     { label: "Pricing", href: "/pricing" },
     { label: "FAQ", href: "/faq" }, 
     { label: "Manifesto", href: "/manifesto" },
+    { label: "SYMI Lab", href: "/symi-lab" }, // <-- Add this line
   ];
   
   // Function to check login and admin status
@@ -52,7 +53,9 @@ function Navbar() {
       <div className="relative max-w-screen-xl mx-auto px-4 py-4">
         {/* Logo (left) */}
         <div className="flex justify-between items-center">
-          <Link href="/" className="flex items-center space-x-2 relative group">
+          <Link 
+           href={hasChatHistory() ? "/blueprint" : "/"}
+           className="flex items-center space-x-2 relative group">
             <Play
               className="w-6 h-6 text-indigo-500 group-hover:text-indigo-700 transition-all duration-300 transform group-hover:scale-110"
               fill="currentColor"

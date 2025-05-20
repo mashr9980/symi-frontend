@@ -464,3 +464,36 @@ h3:hover .anchor-icon {
   60% { content: '...'; }
   100% { content: '.'; }
 }
+
+.no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.scroll-on-hover {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scroll-on-hover::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.scroll-on-hover:hover {
+  scrollbar-width: thin;
+  -ms-overflow-style: auto;
+}
+
+.scroll-on-hover:hover::-webkit-scrollbar {
+  display: block;
+  width: 8px;
+}
+
+.scroll-on-hover:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.4); /* Optional: style the thumb */
+  border-radius: 4px;
+}
