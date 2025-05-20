@@ -20,7 +20,7 @@ export default function PricingSection() {
   setUserRole(role);
 
   // Use getPaymentStatusFromCache to get payment status, plan_id, and premium status
-  const { status, plan_id } = getPaymentStatusFromCache ? getPaymentStatusFromCache() : {};
+  const { status, plan_id } = getPaymentStatusFromCache ? getPaymentStatusFromCache() : { status: null, plan_id: null };
   if (plan_id) {
     setActivePlanId(Number(plan_id)); // Ensure number type
   } else {
