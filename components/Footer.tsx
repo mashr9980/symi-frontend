@@ -28,8 +28,8 @@ export default function Footer() {
               <li><Link 
                href={hasChatHistory() ? "/blueprint" : "/"}
               className="hover:underline">Home</Link></li>
-              {/* <li><Link href="/symi-os" className="hover:underline">SYMI OS</Link></li> */}
-              {/* <li><Link href="/about" className="hover:underline">About</Link></li> */}
+              <li><Link href="/terms" className="hover:underline">Terms of Service</Link></li>
+              <li><Link href="/privacy" className="hover:underline">Privacy Policy</Link></li>
             </ul>
           </div>
 

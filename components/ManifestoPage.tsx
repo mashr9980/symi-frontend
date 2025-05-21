@@ -105,7 +105,7 @@ export default function ManifestoPage() {
         >
           <div className="flex items-center justify-center mb-12">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 blur-xl opacity-70 rounded-full transform scale-110"></div>
+              {/* <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 blur-xl opacity-70 rounded-full transform scale-110"></div> */}
               <h1 className="text-5xl sm:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 leading-tight py-4 px-6 relative">
                 SYMI Manifesto
               </h1>

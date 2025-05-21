@@ -1,6 +1,5 @@
-'use client'; // Mark this component as a Client Component
+'use client';
 
-import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import config from '../config'; 
@@ -9,7 +8,7 @@ import { saveTokenWithExpiry } from "../utils/auth";
 
 export default function SignUp() {
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const [loading, setLoading] = useState(false); // Loading state for the button
+  const [loading, setLoading] = useState(false);
   const [professions, setProfessions] = useState([]);
   const router = useRouter();
   
@@ -18,14 +17,13 @@ export default function SignUp() {
     setPasswordStrength(strength);
   };
 
-  // Fetch professions on page load
   useEffect(() => {
     const fetchProfessions = async () => {
       try {
         const response = await fetch(`${config.apiBaseUrl}/professions`);
         if (response.ok) {
           const data = await response.json();
-          setProfessions(data); // Set the professions in state
+          setProfessions(data);
         } else {
           console.error('Failed to fetch professions');
         }
@@ -60,16 +58,16 @@ export default function SignUp() {
 
       if (response.ok) {
         const responseData = await response.json();
-        const accessToken = responseData.access_token; // Extract the access token from the response
+        const accessToken = responseData.access_token;
         const role = responseData.role;
         saveTokenWithExpiry(accessToken);
         localStorage.setItem("user_role", role);
         localStorage.setItem("user_email", data.email);
-        // Redirect based on user role
+        
         if (role === "admin") {
-            router.push("/blueprint"); // Redirect to admin dashboard
+            router.push("/blueprint");
         } else {
-          router.push("/prompt"); // Redirect to prompt page
+          router.push("/prompt");
         }
       } else {
         const errorData = await response.json();
@@ -84,31 +82,31 @@ export default function SignUp() {
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#efe2fc] to-white px-4 py-12">
-      <div className="max-w-md w-full bg-white/80 backdrop-blur-md p-10 rounded-3xl shadow-xl border border-purple-100/50 text-center space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#efe2fc] to-white dark:from-[#2D1B45] dark:to-[#1a1a2e] px-4 py-12">
+      <div className="max-w-md w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md p-10 rounded-3xl shadow-xl border border-purple-100/50 dark:border-purple-500/20 text-center space-y-2 mt-12">
         {/* Symbol */}
         <div className="flex justify-center">
-          <div className="relative w-12 h-12">
-            <div className="w-full h-full bg-[#4C00FF] rounded-full"></div>
-            <div className="absolute inset-0 bg-[#4C00FF]/30 rounded-full blur-xl opacity-50 animate-pulse"></div>
+          <div className="relative w-14 h-14">
+            <div className="w-full h-full bg-[#4C00FF] dark:bg-[#6E30FF] rounded-full"></div>
+            <div className="absolute inset-0 bg-[#4C00FF]/30 dark:bg-[#6E30FF]/50 rounded-full blur-xl opacity-70 animate-pulse"></div>
           </div>
         </div>
 
         {/* Progress Indicator */}
         <div className="relative">
-          <div className="absolute h-1 bg-gray-100 rounded-full w-full top-1/2"></div>
+          <div className="absolute h-1 bg-gray-100 dark:bg-gray-700 rounded-full w-full top-1/2"></div>
           <div className="relative flex justify-between">
-            <div className="w-6 h-6 bg-[#4C00FF] rounded-full flex items-center justify-center text-white text-xs font-bold">1</div>
-            <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-xs">2</div>
-            <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-xs">3</div>
+            <div className="w-6 h-6 bg-[#4C00FF] dark:bg-[#6E30FF] rounded-full flex items-center justify-center text-white text-xs font-bold">1</div>
+            <div className="w-6 h-6 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 text-xs">2</div>
+            <div className="w-6 h-6 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 text-xs">3</div>
           </div>
         </div>
 
         <div>
-          <h1 className="text-3xl font-semibold text-gray-900">
+          <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">
             Join SYMI
           </h1>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
             Create your account in a few steps
           </p>
         </div>
@@ -121,7 +119,7 @@ export default function SignUp() {
               id="username" 
               name="username" 
               required 
-              className="w-full px-4 py-3 border border-purple-200 rounded-xl text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 focus:border-[#4C00FF] transition-all"
+              className="w-full px-4 py-3 border border-purple-200 dark:border-purple-800 rounded-xl text-sm bg-white/50 dark:bg-gray-900/50 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 dark:focus:ring-[#6E30FF]/50 focus:border-[#4C00FF] dark:focus:border-[#6E30FF] transition-all"
               placeholder="Username" 
             />
           </div>
@@ -132,7 +130,7 @@ export default function SignUp() {
               id="email" 
               name="email" 
               required 
-              className="w-full px-4 py-3 border border-purple-200 rounded-xl text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 focus:border-[#4C00FF] transition-all"
+              className="w-full px-4 py-3 border border-purple-200 dark:border-purple-800 rounded-xl text-sm bg-white/50 dark:bg-gray-900/50 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 dark:focus:ring-[#6E30FF]/50 focus:border-[#4C00FF] dark:focus:border-[#6E30FF] transition-all"
               placeholder="Email address" 
             />
           </div>
@@ -143,11 +141,11 @@ export default function SignUp() {
               id="password"
               name="password"
               required
-              className="w-full px-4 py-3 border border-purple-200 rounded-xl text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 focus:border-[#4C00FF] transition-all"
+              className="w-full px-4 py-3 border border-purple-200 dark:border-purple-800 rounded-xl text-sm bg-white/50 dark:bg-gray-900/50 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 dark:focus:ring-[#6E30FF]/50 focus:border-[#4C00FF] dark:focus:border-[#6E30FF] transition-all"
               placeholder="Create password"
               onInput={(e) => checkPasswordStrength((e.target as HTMLInputElement).value)}
             />
-            <div className="password-strength mt-2 h-1 rounded-full overflow-hidden">
+            <div className="password-strength mt-2 h-1 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700">
               <div 
                 className="h-full transition-all duration-300" 
                 style={{ 
@@ -156,7 +154,7 @@ export default function SignUp() {
                 }} 
               />
             </div>
-            <span className="text-xs text-gray-500 mt-1 block text-left">Minimum 8 characters with uppercase & number</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block text-left">Minimum 8 characters with uppercase & number</span>
           </div>
 
           <div className="relative">
@@ -164,7 +162,7 @@ export default function SignUp() {
               name="profession"
               id="profession"
               required
-              className="w-full px-4 py-3 border border-purple-200 rounded-xl text-sm bg-white/50 focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 focus:border-[#4C00FF] transition-all appearance-none"
+              className="w-full px-4 py-3 border border-purple-200 dark:border-purple-800 rounded-xl text-sm bg-white/50 dark:bg-gray-900/50 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 dark:focus:ring-[#6E30FF]/50 focus:border-[#4C00FF] dark:focus:border-[#6E30FF] transition-all appearance-none"
             >
               <option value="" disabled selected>Select your profession</option>
               {professions.map((profession: { id: number; name: string }) => (
@@ -174,7 +172,7 @@ export default function SignUp() {
               ))}
             </select>
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg className="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </div>
@@ -182,18 +180,28 @@ export default function SignUp() {
 
           {/* Terms */}
           <div className="flex items-center space-x-2">
-            <input type="checkbox" id="terms" required className="w-4 h-4 rounded border-purple-200 text-[#4C00FF] focus:ring-[#4C00FF]" />
-            <label htmlFor="terms" className="text-xs text-gray-500">
+            <input 
+              type="checkbox" 
+              id="terms" 
+              required 
+              className="w-4 h-4 rounded border-purple-200 dark:border-purple-800 text-[#4C00FF] dark:text-[#6E30FF] focus:ring-[#4C00FF] dark:focus:ring-[#6E30FF]" 
+            />
+            <label htmlFor="terms" className="text-xs text-gray-500 dark:text-gray-400">
               I agree to the{' '}
-              <a href="#" className="text-[#4C00FF] hover:text-[#4200e6]">Terms</a> and{' '}
-              <a href="#" className="text-[#4C00FF] hover:text-[#4200e6]">Privacy Policy</a>.
+              <Link href="/terms" className="text-[#4C00FF] dark:text-[#8E65FF] hover:text-[#4200e6] dark:hover:text-[#A585FF] mx-1">
+              Terms
+            </Link>
+          and
+          <Link href="/privacy" className="text-[#4C00FF] dark:text-[#8E65FF] hover:text-[#4200e6] dark:hover:text-[#A585FF] mx-1">
+              Privacy Policy
+            </Link>
             </label>
           </div>
 
           {/* Submit */}
           <button 
             type="submit" 
-            className={`w-full bg-[#4C00FF] text-white py-3 rounded-xl font-medium hover:bg-[#4200e6] transition-all transform hover:scale-[1.02] active:scale-[0.98] ${
+            className={`w-full bg-gradient-to-r from-[#4C00FF] to-[#6E30FF] text-white py-3 rounded-xl font-medium hover:from-[#4200e6] hover:to-[#5d28d8] transition-all transform hover:scale-[1.02] active:scale-[0.98] ${
               loading ? "opacity-70 cursor-wait" : ""
             }`}
             disabled={loading}
@@ -213,9 +221,9 @@ export default function SignUp() {
         </form>
 
         {/* Sign In Link */}
-        <div className="text-sm text-gray-500 pt-4">
+        <div className="text-sm text-gray-500 dark:text-gray-400 pt-4">
           Already have an account?{" "}
-          <Link href="/auth/login" className="text-[#4C00FF] hover:text-[#4200e6] font-medium">
+          <Link href="/auth/login" className="text-[#4C00FF] dark:text-[#8E65FF] hover:text-[#4200e6] dark:hover:text-[#A585FF] font-medium">
             Log In
           </Link>
         </div>

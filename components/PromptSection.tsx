@@ -7,7 +7,7 @@ import { isTokenExpired, handleLogout, getPaymentStatusFromCache } from "../util
 import { Send, Mic, Bot, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Add TypeScript definitions for Web Speech API without extending Window
+// Add TypeScript definitions for Web Speech API
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
   resultIndex: number;
@@ -66,13 +66,41 @@ export default function PromptSection() {
   const [chatHistory, setChatHistory] = useState<{role: string, content: string, timestamp: Date}[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   
   // Refs
   const webSocketRef = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
-  const recognitionRef = useRef<any>(null); // Use 'any' to avoid type conflicts
+  const recognitionRef = useRef<any>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
+
+  // Check for dark mode
+  useEffect(() => {
+    const checkDarkMode = () => {
+      if (typeof window !== 'undefined') {
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setIsDarkMode(isDark);
+      }
+    };
+    
+    checkDarkMode();
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => checkDarkMode();
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
+    }
+  }, [userInput]);
 
   // Check window size for responsive layout
   useEffect(() => {
@@ -86,7 +114,10 @@ export default function PromptSection() {
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Check if the user is logged in and has premium access
+  // Check if the user is logged in and has premium access, and if user is admin
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdminWarning, setShowAdminWarning] = useState(false);
+  
   useEffect(() => {
     const checkAuthorization = async () => {
       const accessToken = localStorage.getItem("access_token");
@@ -97,6 +128,14 @@ export default function PromptSection() {
       
       if (isTokenExpired()) {
         handleLogout(router);
+        return;
+      }
+      
+      // Check if user is admin
+      const userRole = localStorage.getItem("user_role");
+      if (userRole === "admin") {
+        setIsAdmin(true);
+        setShowAdminWarning(true);
         return;
       }
       
@@ -240,13 +279,13 @@ export default function PromptSection() {
   }, []);
 
   // Handle user input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setUserInput(e.target.value);
   };
 
   // Handle form submission or "Enter" key press
   const handleSendMessage = () => {
-    if (!userInput.trim()) return;
+    if (!userInput.trim() || loading) return;
     
     if (webSocketRef.current && webSocketRef.current.readyState === WebSocket.OPEN) {
       // First add user message to chat history
@@ -267,8 +306,8 @@ export default function PromptSection() {
     }
   };
 
-  // Handle "Enter" key press
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Handle "Enter" key press (send message on Enter, add new line on Shift+Enter)
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -345,17 +384,58 @@ export default function PromptSection() {
 
   // Main render
   return (
-    <div className="min-h-screen overflow-hidden bg-gradient-to-br from-[#efe2fc] to-white text-gray-800">
-      <div className="container mx-auto px-4 py-8 max-w-7xl flex flex-col h-screen mt-24">
+    <div className={`min-h-screen bg-gradient-to-br from-[#efe2fc] to-white dark:from-[#2D1B45] dark:to-[#1a1a2e] text-gray-800 dark:text-gray-200`}>
+      <div className="container mx-auto px-4 py-8 max-w-7xl flex flex-col h-screen mt-20 sm:mt-24">
+        {/* Admin Warning Modal */}
+        {showAdminWarning && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 px-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="w-full max-w-md p-6 rounded-2xl shadow-2xl bg-white dark:bg-gray-800 border border-purple-100/50 dark:border-purple-500/20"
+            >
+              <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+                Admin Account Detected
+              </h2>
+              <div className="mb-6">
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  Your account has admin privileges. Admin accounts cannot use the Blueprint chatbot functionality.
+                </p>
+                <p className="text-gray-700 dark:text-gray-300">
+                  If you want to use the chatbot, please sign up with a personal account.
+                </p>
+              </div>
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => router.push("/")}
+                  className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300"
+                >
+                  Go Back
+                </button>
+                <button
+                  onClick={() => {
+                    handleLogout(router);
+                    router.push("/auth/signup");
+                  }}
+                  className="px-4 py-2 bg-gradient-to-r from-[#4C00FF] to-[#6E30FF] hover:from-[#4200e6] hover:to-[#5d28d8] text-white rounded-lg shadow-md shadow-purple-500/20"
+                >
+                  Sign Up
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
         {/* Header */}
+        {/* {!isAdmin && ( */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center mr-2 bg-[#4C00FF]/10">
-              <Sparkles className="w-5 h-5 text-[#4C00FF]" />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center mr-2 bg-[#4C00FF]/10 dark:bg-[#4C00FF]/20">
+              <Sparkles className="w-5 h-5 text-[#4C00FF] dark:text-[#6E30FF]" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold">SYMI Blueprint</h1>
-              <p className="text-sm text-gray-500">Building your custom Blueprint</p>
+              <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100">SYMI Blueprint</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Building your custom Blueprint</p>
             </div>
           </div>
         </div>
@@ -363,7 +443,7 @@ export default function PromptSection() {
         {/* Chat Container */}
         <div 
           ref={chatContainerRef}
-          className="flex-1 overflow-y-auto mb-4 rounded-2xl p-4 shadow-lg bg-white/70 backdrop-blur-md max-h-[calc(90vh-240px)]"
+          className="flex-1 overflow-y-auto mb-4 rounded-2xl p-4 sm:p-6 shadow-lg bg-white/70 dark:bg-gray-800/30 backdrop-blur-md max-h-[calc(90vh-240px)]"
         >
           <AnimatePresence>
             {chatHistory.map((message, index) => (
@@ -378,15 +458,15 @@ export default function PromptSection() {
                   {/* Avatar */}
                   <div className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${
                     message.role === 'user' 
-                      ? 'bg-indigo-100' 
-                      : 'bg-purple-100'
-                  } mx-2`}>
+                      ? 'bg-indigo-100 dark:bg-indigo-900/50 ml-2' 
+                      : 'bg-purple-100 dark:bg-purple-900/50 mr-2'
+                  }`}>
                     {message.role === 'user' ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-600 dark:text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                       </svg>
                     ) : (
-                      <Bot className="h-4 w-4 text-purple-600" />
+                      <Bot className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                     )}
                   </div>
                   
@@ -394,12 +474,12 @@ export default function PromptSection() {
                   <div 
                     className={`rounded-2xl px-4 py-2 shadow-sm ${
                       message.role === 'user'
-                        ? 'bg-indigo-100 text-gray-800'
-                        : 'bg-white text-gray-800'
+                        ? 'bg-indigo-100 dark:bg-indigo-900/50 text-gray-800 dark:text-gray-200'
+                        : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200'
                     }`}
                   >
                     <p className="whitespace-pre-line">{message.content}</p>
-                    <div className={`text-xs mt-1 text-right ${message.role === 'user' ? 'text-indigo-500' : 'text-gray-500'}`}>
+                    <div className={`text-xs mt-1 text-right ${message.role === 'user' ? 'text-indigo-500 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400'}`}>
                       {formatTime(message.timestamp)}
                     </div>
                   </div>
@@ -416,14 +496,14 @@ export default function PromptSection() {
                 className="flex justify-start mb-4"
               >
                 <div className="flex items-start max-w-[80%]">
-                  <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center bg-purple-100 mx-2">
-                    <Bot className="h-4 w-4 text-purple-600" />
+                  <div className="flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center bg-purple-100 dark:bg-purple-900/50 mr-2">
+                    <Bot className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                   </div>
-                  <div className="rounded-2xl px-6 py-3 shadow-sm bg-white">
+                  <div className="rounded-2xl px-6 py-3 shadow-sm bg-white dark:bg-gray-800">
                     <div className="flex space-x-2">
-                      <div className="w-2 h-2 rounded-full bg-gray-300 animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                      <div className="w-2 h-2 rounded-full bg-gray-300 animate-bounce" style={{ animationDelay: '200ms' }}></div>
-                      <div className="w-2 h-2 rounded-full bg-gray-300 animate-bounce" style={{ animationDelay: '400ms' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 animate-bounce" style={{ animationDelay: '200ms' }}></div>
+                      <div className="w-2 h-2 rounded-full bg-gray-300 dark:bg-gray-600 animate-bounce" style={{ animationDelay: '400ms' }}></div>
                     </div>
                   </div>
                 </div>
@@ -435,15 +515,16 @@ export default function PromptSection() {
         </div>
         
         {/* Input Area */}
-        <div className="p-4 rounded-2xl shadow-lg bg-white">
+        <div className="p-4 rounded-2xl shadow-lg bg-white/80 dark:bg-gray-800/50 backdrop-blur-md border border-purple-100/50 dark:border-purple-500/20">
           <div className="flex items-end gap-2">
             <div className="relative flex-1">
               <textarea
+                ref={textareaRef}
                 placeholder="How can I help you scale your business system today?"
                 value={userInput}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyPress}
-                className="w-full px-4 py-3 pr-12 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-[#4C00FF] bg-gray-50 text-gray-900 placeholder-gray-500 border-gray-200 border"
+                className="w-full px-4 py-3 pr-12 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 dark:focus:ring-[#6E30FF]/50 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 border border-gray-200 dark:border-gray-700"
                 rows={1}
                 style={{ minHeight: '50px', maxHeight: '150px' }}
               />
@@ -455,8 +536,8 @@ export default function PromptSection() {
                 onClick={toggleListening}
                 className={`p-3 rounded-xl transition-colors ${
                   isListening 
-                    ? 'bg-red-500 hover:bg-red-600 text-white' 
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    ? 'bg-red-500 hover:bg-red-600 text-white dark:bg-red-600 dark:hover:bg-red-700' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200'
                 }`}
               >
                 <Mic className="w-5 h-5" />
@@ -468,8 +549,8 @@ export default function PromptSection() {
                 disabled={!userInput.trim() || loading}
                 className={`p-3 rounded-xl transition-colors ${
                   !userInput.trim() || loading
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-[#4C00FF] hover:bg-[#3A00CC] text-white'
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+                    : 'bg-gradient-to-r from-[#4C00FF] to-[#6E30FF] hover:from-[#4200e6] hover:to-[#5d28d8] text-white shadow-md shadow-purple-500/20'
                 }`}
               >
                 <Send className="w-5 h-5" />
@@ -478,7 +559,7 @@ export default function PromptSection() {
           </div>
           
           <div className="mt-2 flex justify-between items-center">
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
               {isListening ? 'Listening... Speak now' : 'Press Enter to send, Shift+Enter for new line'}
             </div>
           </div>
@@ -487,47 +568,47 @@ export default function PromptSection() {
       
       {/* Popup Modal */}
       {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 px-4">
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-md p-6 rounded-2xl shadow-2xl bg-white"
+            className="w-full max-w-md p-6 rounded-2xl shadow-2xl bg-white dark:bg-gray-800 border border-purple-100/50 dark:border-purple-500/20"
           >
-            <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
               Generate Blueprint Report
             </h2>
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1 text-gray-700">
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
                 Business Name
               </label>
               <input
                 type="text"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
-                className="w-full p-2 rounded-lg bg-white text-gray-900 border-gray-300 border focus:outline-none focus:ring-2 focus:ring-[#4C00FF]"
+                className="w-full p-2 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 dark:focus:ring-[#6E30FF]/50"
               />
             </div>
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-1 text-gray-700">
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
                 Owner Name
               </label>
               <input
                 type="text"
                 value={ownerName}
                 onChange={(e) => setOwnerName(e.target.value)}
-                className="w-full p-2 rounded-lg bg-white text-gray-900 border-gray-300 border focus:outline-none focus:ring-2 focus:ring-[#4C00FF]"
+                className="w-full p-2 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 dark:focus:ring-[#6E30FF]/50"
               />
             </div>
             <div className="flex justify-end space-x-4">
               <button
                 onClick={() => setShowPopup(false)}
-                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800"
+                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300"
               >
                 Cancel
               </button>
               <button
                 onClick={handlePopupSubmit}
-                className="px-4 py-2 bg-[#4C00FF] hover:bg-[#3A00CC] text-white rounded-lg"
+                className="px-4 py-2 bg-gradient-to-r from-[#4C00FF] to-[#6E30FF] hover:from-[#4200e6] hover:to-[#5d28d8] text-white rounded-lg shadow-md shadow-purple-500/20"
               >
                 Generate Report
               </button>
