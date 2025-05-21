@@ -8,6 +8,19 @@ import { getPaymentStatusFromCache } from "../utils/auth";
 export default function FinalCTA() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Check for mobile screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', checkScreenSize);
+    checkScreenSize(); // Initial check
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
   
   const handleCreateBlueprintClick = async () => {
     setIsLoading(true);
@@ -34,7 +47,7 @@ export default function FinalCTA() {
 
   return (
     <motion.div
-      className="w-full flex flex-col items-center justify-center text-center space-y-6 mt-16"
+      className="w-full flex flex-col items-center justify-center text-center space-y-4 sm:space-y-6 mt-10 sm:mt-16"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
@@ -42,7 +55,7 @@ export default function FinalCTA() {
       <button 
         onClick={handleCreateBlueprintClick}
         disabled={isLoading}
-        className={`relative cta-button min-w-[160px] px-8 py-4 text-lg font-semibold bg-[#4C00FF] hover:bg-[#4c2fd8] text-white rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-y-95 ${
+        className={`relative cta-button min-w-[160px] px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold bg-[#4C00FF] hover:bg-[#4c2fd8] text-white rounded-xl transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-y-95 ${
           isLoading ? "opacity-80" : ""
         }`}
       >
@@ -61,7 +74,7 @@ export default function FinalCTA() {
         )}
       </button>
 
-      <p className="text-sm sm:text-md text-gray-500">
+      <p className={`${isMobile ? 'text-xs' : 'text-sm sm:text-md'} text-gray-500`}>
         We begin with a <strong>Blueprint</strong>. The rest is precision.
       </p>
     </motion.div>

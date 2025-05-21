@@ -16,6 +16,19 @@ export default function PricingSection() {
   const [isPremium, setIsPremium] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [processingPlan, setProcessingPlan] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check screen size for responsive layout
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', checkScreenSize);
+    checkScreenSize(); // Initial check
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   // Check payment status on component mount
   useEffect(() => {
@@ -172,14 +185,14 @@ export default function PricingSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-gray-700 dark:text-gray-300">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl sm:text-5xl font-semibold mb-6 py-10">Pricing</h1>
-          <p className="text-lg sm:text-xl text-gray-800 max-w-2xl mx-auto pb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold mb-6 py-10">Pricing</h1>
+          <p className="text-base sm:text-lg md:text-xl text-gray-800 max-w-2xl mx-auto pb-12">
             Choose the right level of intelligent automation to fit your vision.
           </p>
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-16 sm:mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center mb-16 sm:mb-20">
           {plans.map((plan, index) => {
             const isActive = activePlanId === Number(plan.id) && isPremium;
             const isSelectable = canSelectPlan(plan);
@@ -187,10 +200,9 @@ export default function PricingSection() {
             return (
               <div
                 key={index}
-                className={`flex flex-col relative bg-white/5 backdrop-blur-sm rounded-3xl p-8 shadow-lg max-w-s mx-auto sm:max-w-lg hover:shadow-2xl transition-all duration-200 ${
-                  isActive ? "border-4 border-[#4C00FF]" : ""
+                className={`flex flex-col relative bg-white/5 backdrop-blur-sm rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-200 ${
+                  isActive ? "border-4 border-[#4C00FF]" : "border border-purple-100/30"
                 }`}
-                style={{ width: "375px", height: "550px" }}
               >
                 {isActive && (
                   <div className="absolute -top-3 -right-3 bg-[#4C00FF] text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -198,38 +210,39 @@ export default function PricingSection() {
                   </div>
                 )}
                 
-                <div className="flex-1 flex flex-col">
-                  <div className="mb-6 text-center">
-                    <div className="w-16 h-16 mb-4 mx-auto">
-                      <img
-                        src="/assets/icons/cc7.png"
-                        alt={plan.name}
-                      />
-                    </div>
-                    <h2 className="text-2xl font-bold mb-2">{plan.name}</h2>
-                    <p className="text-gray-600">{plan.description}</p>
+                {/* Card Header with fixed height */}
+                <div className="px-6 pt-8 pb-4 text-center border-b border-purple-100/20">
+                  <div className="w-16 h-16 mb-4 mx-auto">
+                    <img
+                      src="/assets/icons/cc7.png"
+                      alt={plan.name}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
-                  <div className="text-4xl font-bold mb-8 text-center">
+                  <h2 className="text-xl font-bold mb-2 text-gray-900">{plan.name}</h2>
+                  <p className="text-gray-600 text-sm h-12 overflow-hidden">{plan.description}</p>
+                  <div className="text-3xl font-bold mt-4 text-[#4C00FF]">
                     {plan.currency} {plan.price}
-                  </div>
-                  <div
-                    className={`space-y-4 mb-8 ${
-                      plan.features.length > 3 ? "overflow-y-auto scroll-on-hover" : ""
-                    }`}
-                    style={plan.features.length > 3 ? { maxHeight: "144px" } : {}}
-                  >
-                    {plan.features.map((feature: string, i: number) => (
-                      <FeatureItem key={i} text={feature} />
-                    ))}
                   </div>
                 </div>
                 
-                {/* Action area: badge or button */}
-                <div className="w-full flex justify-center items-center mt-auto">
+                {/* Features with fixed height and scrollable */}
+                <div className="flex-1 px-6 py-6">
+                  <div className="h-[230px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-200 scrollbar-track-transparent">
+                    <div className="space-y-3">
+                      {plan.features.map((feature: string, i: number) => (
+                        <FeatureItem key={i} text={feature} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Action area: badge or button with fixed height */}
+                <div className="p-6 pt-2 bg-gradient-to-b from-transparent to-white/50 rounded-b-3xl">
                   {isActive ? (
                     <Link 
                       href="/prompt" 
-                      className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-medium transition-all text-center flex items-center justify-center"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-xl font-medium transition-all text-center flex items-center justify-center shadow-md shadow-green-600/20"
                     >
                       <CheckCircle className="w-5 h-5 mr-2" />
                       Go to Your Blueprint
@@ -239,9 +252,11 @@ export default function PricingSection() {
                       onClick={() => handleCheckout(plan.id)}
                       className={`w-full relative flex justify-center items-center ${
                         isSelectable 
-                          ? "bg-indigo-600 hover:bg-indigo-700" 
+                          ? "bg-[#4C00FF] hover:bg-[#3A00CC]" 
                           : "bg-gray-400"
-                      } text-white px-6 py-3 rounded-xl font-medium transition-all ${
+                      } text-white px-4 py-3 rounded-xl font-medium transition-all shadow-md ${
+                        isSelectable ? "shadow-[#4C00FF]/20" : "shadow-gray-400/20"
+                      } ${
                         !isSelectable ? "cursor-not-allowed" : ""
                       }`}
                       disabled={!isSelectable || processingPlan === plan.id}
@@ -276,9 +291,9 @@ export default function PricingSection() {
 
 function FeatureItem({ text }: { text: string }) {
   return (
-    <div className="flex items-center gap-3">
-      <CheckCircle className="w-5 h-5 text-[#3A00FF]" />
-      <span>{text}</span>
+    <div className="flex items-start gap-3">
+      <CheckCircle className="w-5 h-5 text-[#4C00FF] flex-shrink-0 mt-0.5" />
+      <span className="text-sm text-gray-700">{text}</span>
     </div>
   );
 }

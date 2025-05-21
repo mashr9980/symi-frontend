@@ -22,9 +22,22 @@ export default function HeroSection() {
   const [trialExpired, setTrialExpired] = useState(false);
   const [paymentData, setPaymentData] = useState<{ status: string | null, expiredStatus: boolean | null }>({ status: null, expiredStatus: null });
   const router = useRouter();
+  const [isMobile, setIsMobile] = useState(false);
 
   // WebSocket ref
   const wsRef = useRef<WebSocket | null>(null);
+
+  // Check screen size for responsive layout
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', checkScreenSize);
+    checkScreenSize(); // Initial check
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   // Restore chat from localStorage if present
   useEffect(() => {
@@ -171,9 +184,9 @@ export default function HeroSection() {
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#efe2fc] to-white -z-10"></div>
 
-      <div className="breathe-overlay max-w-3xl w-full text-center relative z-10 mt-4 sm:mt-32 ">
+      <div className="breathe-overlay max-w-3xl w-full text-center relative z-10 mt-4 sm:mt-32 px-4 sm:px-0">
         {/* Hero Title */}
-        <h1 className="hero-headline text-black text-[4rem] font-bold leading-tight text-center mb-6 letter-spacing:-0.05em">
+        <h1 className={`hero-headline text-black ${isMobile ? 'text-3xl' : 'text-[4rem]'} font-bold leading-tight text-center mb-6 letter-spacing:-0.05em`}>
           What are you building today?
         </h1>
 
@@ -225,14 +238,14 @@ export default function HeroSection() {
 
         {/* Flow Diagram */}
         <Diagram />
-        <p className="hero-subhead text-gray-500 mb-6 ">
+        <p className="hero-subhead text-gray-500 mb-6 text-base sm:text-xl">
           We architect systems that scale like your ambition.
         </p>
 
         {/* Chat Section */}
         <div className="w-full max-w-xl mx-auto mt-8">
           {(chatHistory.length > 0 || loading) && (
-            <div className="bg-white/80 dark:bg-gray-900/60 rounded-xl shadow p-6 mb-4 text-left text-gray-700 dark:text-gray-300">
+            <div className="bg-white/80 dark:bg-gray-900/60 rounded-xl shadow p-4 sm:p-6 mb-4 text-left text-gray-700 dark:text-gray-300">
               <div className="mb-2 flex items-center">
                 <span className="font-semibold text-indigo-700 dark:text-indigo-300">You:</span>
                 <span className="ml-2 flex items-center">
@@ -271,8 +284,8 @@ export default function HeroSection() {
 
       {/* Trial Expired Popup */}
       {trialExpired && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 text-gray-700 dark:text-gray-300">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 text-gray-700 dark:text-gray-300 px-4">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:max-w-md text-center">
             <h2 className="text-xl font-semibold mb-4">Trial Expired</h2>
             <p className="mb-6">
               Your trial period has ended. If you want to proceed, please log in.

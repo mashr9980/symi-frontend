@@ -49,7 +49,7 @@ export default function SystemBuilder2() {
 
         <div className="py-12">
           <div className="flex justify-center items-center gap-6 text-sm text-gray-600 flex-wrap">
-            <span>— API-First</span>
+            <span>API-First</span>
             <span>Modular</span>
             <span>Scalable</span>
             <span>Custom-Crafted</span>
