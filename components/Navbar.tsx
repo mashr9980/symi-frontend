@@ -3,15 +3,16 @@ import React, { useState, useEffect } from "react";
 import { Play, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { hasChatHistory, handleLogout } from "../utils/auth"; // Import utility functions
+import { hasChatHistory, handleLogout } from "../utils/auth";
 
 function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false); // State to track if the user is an admin
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track if the user is logged in
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
    
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -19,10 +20,9 @@ function Navbar() {
     { label: "Blueprint", href: "/blueprint" },
     { label: "System Builder", href: "/system-builder" },
     { label: "Pricing", href: "/pricing" },
-    { label: "SYMI Lab", href: "/symi-lab" }, // <-- Add this line
+    { label: "SYMI Lab", href: "/symi-lab" },
   ];
   
-  // Function to check login and admin status
   const checkAuthStatus = () => {
     const userRole = localStorage.getItem("user_role");
     const accessToken = localStorage.getItem("access_token");
@@ -44,160 +44,162 @@ function Navbar() {
     if (typeof window !== "undefined") {
       checkAuthStatus();
       
-      // Check if we're on mobile
       const checkMobile = () => {
         setIsMobile(window.innerWidth < 768);
       };
       
-      // Set initial value
       checkMobile();
       
-      // Add window resize listener
       window.addEventListener('resize', checkMobile);
       
-      // Clean up
-      return () => window.removeEventListener('resize', checkMobile);
+      const handleScroll = () => {
+        if (window.scrollY > 20) {
+          setScrolled(true);
+        } else {
+          setScrolled(false);
+        }
+      };
+      
+      window.addEventListener('scroll', handleScroll);
+      
+      return () => {
+        window.removeEventListener('resize', checkMobile);
+        window.removeEventListener('scroll', handleScroll);
+      }
     }
   }, [pathname]);
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-transparent backdrop-blur-md border-b border-gray-300">
-      <div className="relative max-w-screen-xl mx-auto px-4 py-4">
-        {/* Logo and Mobile Menu Container */}
+    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-md' : 'bg-white/40 backdrop-blur-sm border-b border-white/20'}`}>
+      <div className="relative max-w-screen-xl mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
-          {/* Logo (left) */}
           <Link 
            href={hasChatHistory() ? "/blueprint" : "/"}
            className="flex items-center space-x-2 relative group">
-            <Play
-              className="w-6 h-6 text-indigo-500 group-hover:text-indigo-700 transition-all duration-300 transform group-hover:scale-110"
-              fill="currentColor"
-            />
-            <span className="text-xl font-bold text-black dark:text-white group-hover:text-indigo-500 transition-all duration-300">
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full p-2 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-indigo-500/30">
+              <Play
+                className="w-4 h-4 text-white group-hover:scale-110 transition-all"
+                fill="currentColor"
+              />
+            </div>
+            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 transition-all duration-300">
               SYMI
             </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-300 to-indigo-600 opacity-0 group-hover:opacity-30 rounded-full blur-xl transition-all duration-300"></div>
           </Link>
 
-          {/* Mobile menu button */}
           <button
-            className="md:hidden flex items-center"
+            className="md:hidden flex items-center justify-center h-10 w-10 rounded-full bg-white/90 backdrop-blur-lg shadow-sm border border-purple-100"
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
             {isOpen ? (
-              <X className="h-6 w-6 text-gray-900" />
+              <X className="h-5 w-5 text-indigo-600" />
             ) : (
-              <Menu className="h-6 w-6 text-gray-900" />
+              <Menu className="h-5 w-5 text-indigo-600" />
             )}
           </button>
         </div>
 
-        {/* Desktop Navigation */}
-        <div className={`hidden md:flex items-center justify-center space-x-4 px-4 py-2 bg-transparent dark:bg-transparent transition-all duration-500 text-sm sm:text-lg mb-2`}>
+        <div className={`hidden md:flex items-center justify-center space-x-1 px-4 py-2 mt-2 rounded-full transition-all duration-500 bg-white/90 backdrop-blur-sm shadow-lg border border-purple-100`}>
           {navLinks.map((item, i) => (
-            <div key={i} className="relative">
-              <Link
-                href={item.href!}
-                className={`nav-item group block px-2 md:px-0 text-gray-800 dark:text-gray-200 transition duration-300 relative
-                ${pathname === item.href ? "text-[#0078ff] font-semibold" : ""}`}
-              >
-                <span className="relative z-10 whitespace-nowrap">{item.label}</span>
-                <span className="pointer-events-none absolute bottom-0 left-1/2 w-0 h-[2px] bg-indigo-500 transition-all duration-200 group-hover:left-0 group-hover:w-full transform -translate-x-1/2 group-hover:translate-x-0"></span>
-              </Link>
-            </div>
+            <Link
+              key={i}
+              href={item.href}
+              className={`relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ${
+                pathname === item.href 
+                ? "text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-md" 
+                : "text-gray-700 hover:bg-white hover:shadow-sm"
+              }`}
+            >
+              {item.label}
+            </Link>
           ))}
 
-          {/* Admin Tab (conditionally rendered) */}
           {isAdmin && (
-            <div className="relative">
-              <Link
-                href="/admin"
-                className={`nav-item group block px-2 md:px-0 text-gray-800 dark:text-gray-200 transition duration-300 relative
-                ${pathname === "/admin" ? "text-[#0078ff] font-semibold" : ""}`}
-              >
-                <span className="relative z-10 whitespace-nowrap">Admin</span>
-                <span className="pointer-events-none absolute bottom-0 left-1/2 w-0 h-[2px] bg-indigo-500 transition-all duration-200 group-hover:left-0 group-hover:w-full transform -translate-x-1/2 group-hover:translate-x-0"></span>
-              </Link>
-            </div>
+            <Link
+              href="/admin"
+              className={`relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-300 ${
+                pathname === "/admin" 
+                ? "text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-md" 
+                : "text-gray-700 hover:bg-white hover:shadow-sm"
+              }`}
+            >
+              Admin
+            </Link>
           )}
 
-          {/* Login/Logout Button */}
-          <div className="relative">
-            {isLoggedIn ? (
-              <button
-                onClick={() => handleLogout(router, setIsLoggedIn, setIsAdmin)}
-                className="nav-item group block px-2 md:px-0 text-gray-800 dark:text-gray-200 transition duration-300 relative"
-              >
-                <span className="relative z-10 whitespace-nowrap">Logout</span>
-                <span className="pointer-events-none absolute bottom-0 left-1/2 w-0 h-[2px] bg-indigo-500 transition-all duration-200 group-hover:left-0 group-hover:w-full transform -translate-x-1/2 group-hover:translate-x-0"></span>
-              </button>
-            ) : (
-              <Link
-                href="/auth/login"
-                className="nav-item group block px-2 md:px-0 text-gray-800 dark:text-gray-200 transition duration-300 relative"
-              >
-                <span className="relative z-10 whitespace-nowrap">Login</span>
-                <span className="pointer-events-none absolute bottom-0 left-1/2 w-0 h-[2px] bg-indigo-500 transition-all duration-200 group-hover:left-0 group-hover:w-full transform -translate-x-1/2 group-hover:translate-x-0"></span>
-              </Link>
-            )}
-          </div>
+          <div className="flex-1"></div>
+
+          {isLoggedIn ? (
+            <button
+              onClick={() => handleLogout(router, setIsLoggedIn, setIsAdmin)}
+              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-md hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-300"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-md hover:shadow-lg hover:shadow-indigo-500/30 transition-all duration-300"
+            >
+              Login
+            </Link>
+          )}
         </div>
 
-        {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-sm shadow-lg py-4 border-b border-gray-200 z-50 animate-fadeScaleIn">
-            <div className="flex flex-col space-y-4 px-4">
+          <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-lg shadow-xl py-4 px-4 rounded-2xl mt-2 border border-purple-100 z-50 animate-fadeScaleIn">
+            <div className="flex flex-col p-2 space-y-1">
               {navLinks.map((item, i) => (
                 <Link
                   key={i}
-                  href={item.href!}
+                  href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className={`py-2 px-3 rounded-lg ${
+                  className={`py-3 px-4 rounded-xl text-center font-medium transition-all ${
                     pathname === item.href
-                      ? "bg-indigo-50 text-indigo-600 font-medium"
-                      : "text-gray-800 hover:bg-gray-100"
+                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20"
+                      : "bg-white text-gray-700 border border-gray-100 hover:border-indigo-200 hover:shadow-sm"
                   }`}
                 >
                   {item.label}
                 </Link>
               ))}
               
-              {/* Admin link for mobile */}
               {isAdmin && (
                 <Link
                   href="/admin"
                   onClick={() => setIsOpen(false)}
-                  className={`py-2 px-3 rounded-lg ${
+                  className={`py-3 px-4 rounded-xl text-center font-medium transition-all ${
                     pathname === "/admin"
-                      ? "bg-indigo-50 text-indigo-600 font-medium"
-                      : "text-gray-800 hover:bg-gray-100"
+                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20"
+                      : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
                   Admin
                 </Link>
               )}
               
-              {/* Login/Logout for mobile */}
-              {isLoggedIn ? (
-                <button
-                  onClick={() => {
-                    handleLogout(router, setIsLoggedIn, setIsAdmin);
-                    setIsOpen(false);
-                  }}
-                  className="py-2 px-3 rounded-lg text-left text-gray-800 hover:bg-gray-100"
-                >
-                  Logout
-                </button>
-              ) : (
-                <Link
-                  href="/auth/login"
-                  onClick={() => setIsOpen(false)}
-                  className="py-2 px-3 rounded-lg text-gray-800 hover:bg-gray-100"
-                >
-                  Login
-                </Link>
-              )}
+              <div className="pt-2 mt-2 border-t border-gray-100">
+                {isLoggedIn ? (
+                  <button
+                    onClick={() => {
+                      handleLogout(router, setIsLoggedIn, setIsAdmin);
+                      setIsOpen(false);
+                    }}
+                    className="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium shadow-md shadow-indigo-500/20"
+                  >
+                    Logout
+                  </button>
+                ) : (
+                  <Link
+                    href="/auth/login"
+                    onClick={() => setIsOpen(false)}
+                    className="block w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-center font-medium shadow-md shadow-indigo-500/20"
+                  >
+                    Login
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         )}

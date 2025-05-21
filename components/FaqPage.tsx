@@ -22,7 +22,7 @@ const FaqPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, ease: "easeOut" }}
       >
-        <h1 className="text-3xl sm:text-6xl font-semibold text-black leading-tight py-8 mt-20">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 mt-6">
           Frequently Asked Questions
         </h1>
         <motion.div

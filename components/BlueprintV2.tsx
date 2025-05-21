@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import FinalCTA from "./FinalCTA";
-import { Play, ChevronDown, X } from "lucide-react";
 import { getPaymentStatusFromCache } from "../utils/auth";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 const exampleImages = [
   "/assets/examples/symivision.jpg",
@@ -14,13 +14,11 @@ const exampleImages = [
 ];
 
 export default function BlueprintV2() {
-  // Popup state
   const [showPopup, setShowPopup] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Check payment status on component mount
   useEffect(() => {
     // No automatic redirect here - just let users view the blueprint page
   }, []);
@@ -28,42 +26,23 @@ export default function BlueprintV2() {
   const handleStartBlueprint = async () => {
     setIsLoading(true);
     try {
-      // Clear payment status to force fresh check
       localStorage.removeItem("payment_status");
       
       const { status, expiredStatus } = await getPaymentStatusFromCache();
       
-      // If premium and not expired, go to prompt page
       if (status === "premium" && expiredStatus === false) {
         router.push("/prompt");
       } else {
-        // Not premium or expired, go to pricing
         router.push("/pricing");
       }
     } catch (error) {
       console.error("Error checking payment status:", error);
-      // Default to pricing page if there's an error
       router.push("/pricing");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Optional scroll effect on flow steps
-  useEffect(() => {
-    const handleScroll = () => {
-      const steps = document.querySelectorAll(".flow-step");
-      steps.forEach((el, index) => {
-        const speed = 0.05 + index * 0.01;
-        const offset = window.scrollY * speed;
-        (el as HTMLElement).style.transform = `translateY(${offset}px)`;
-      });
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Auto-scroll images in popup every 3 seconds
   useEffect(() => {
     if (!showPopup) return;
     const interval = setInterval(() => {
@@ -73,95 +52,194 @@ export default function BlueprintV2() {
   }, [showPopup]);
 
   return (
-    <section className="relative overflow-hidden py-24 sm:py-32">
-      {/* Background */}
+    <section className="relative min-h-screen overflow-hidden pt-24 pb-16">
+      {/* Background gradients */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#efe2fc] to-white -z-10"></div>
+      <div className="absolute top-40 right-10 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl -z-5"></div>
+      <div className="absolute bottom-20 left-10 w-72 h-72 bg-indigo-400/20 rounded-full blur-3xl -z-5"></div>
 
-      {/* Main Form Section */}
+      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Form Column */}
-          <div className="text-center lg:text-left">
-            <h2 className="text-4xl sm:text-5xl font-semibold text-gray-900 leading-snug mt-1">
-              BLUEPRINT
-            </h2>
-            <p className="text-md text-gray-500 mt-2">
-              Your architecture. Our precision.
-            </p>
-            <div className="text-lg sm:text-xl text-gray-800 max-w-2xl mx-auto pb-12 mt-6">
-              The Blueprint is your personalized system architecture. Designed to scale with Precision maps your growth into automations, assets and flow. Your answer - we build.
-            </div>
-          </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 mt-8 leading-tight">
+            Your Blueprint<br className="md:hidden" /> Experience
+          </h1>
+          <p className="text-xl sm:text-2xl text-gray-700 max-w-3xl mx-auto">
+            A personalized system architecture designed to scale with your vision and amplify your growth.
+          </p>
+        </motion.div>
 
-          {/* Visual Column */}
-          <div className="relative hidden sm:block">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-500/30 rounded-3xl blur-3xl" />
-            <div className="relative">
-              <img
-                src="/assets/icons/cc20.png"
-                alt="Automation Diagram"
-                className="relative w-full h-auto max-w-md mx-auto z-10"
-              />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Left Column */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="lg:order-1 order-2"
+          >
+            <div className="rounded-2xl bg-white/70 backdrop-blur-md shadow-xl p-8 border border-purple-100/50 hover:shadow-purple-200/50 transition-all duration-500">
+              <h2 className="text-2xl font-bold mb-6 text-gray-800">What You'll Receive:</h2>
+              
+              <div className="space-y-6">
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-workflow"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><path d="M10 7h4v10h-4z"></path><path d="M7 10v4h10v-4z"></path></svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">Custom Architecture</h3>
+                    <p className="text-gray-600">Tailored system design that matches your unique workflow</p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-cog"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path><path d="M12 2v2"></path><path d="M12 22v-2"></path><path d="m17 20.66-1-1.73"></path><path d="M11 10.27 7 3.34"></path><path d="m20.66 17-1.73-1"></path><path d="m3.34 7 1.73 1"></path><path d="M14 12h8"></path><path d="M2 12h2"></path><path d="m20.66 7-1.73 1"></path><path d="m3.34 17 1.73-1"></path><path d="m17 3.34-1 1.73"></path><path d="m7 20.66 1-1.73"></path></svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">Built-in Automation</h3>
+                    <p className="text-gray-600">Systems that work even when you don't</p>
+                  </div>
+                </div>
+                
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-line-chart"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">Scalable Framework</h3>
+                    <p className="text-gray-600">Grow without friction or technical debt</p>
+                  </div>
+                </div>
+              </div>
+              
+              <button
+                onClick={handleStartBlueprint}
+                disabled={isLoading}
+                className="w-full mt-8 py-4 px-6 text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all duration-300 relative overflow-hidden group"
+              >
+                <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-90 transition-opacity"></span>
+                <span className="absolute -inset-px bg-gradient-to-r from-indigo-400 to-purple-400 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                <span className="relative">
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <svg className="animate-spin h-5 w-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </div>
+                  ) : (
+                    "Start with Blueprint"
+                  )}
+                </span>
+              </button>
             </div>
-          </div>
+          </motion.div>
+
+          {/* Right Column - Visual */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="lg:order-2 order-1 flex justify-center"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-400/20 to-purple-500/20 rounded-full blur-3xl"></div>
+              <div className="relative z-10 bg-white/30 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-white/50 transform hover:rotate-2 transition-all duration-500">
+                <img
+                  src="/assets/icons/cc20.png"
+                  alt="Blueprint Visualization"
+                  className="w-full max-w-md h-auto rounded-xl transform hover:scale-105 transition-all duration-700"
+                />
+                <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                  <span className="transform -rotate-12">✓</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-6 mt-20 text-center">
-          <button
-            type="button"
-            onClick={handleStartBlueprint}
-            disabled={isLoading}
-            className={`border-2 bg-[#5212ff] text-white px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse ${
-              isLoading ? "opacity-80" : ""
-            }`}
-          >
-            {isLoading ? (
-              <>
-                <span className="opacity-0">Start with Blueprint</span>
-                <span className="absolute inset-0 flex items-center justify-center">
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                </span>
-              </>
-            ) : (
-              "Start with Blueprint"
-            )}
-          </button>
+        {/* Testimonial section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="mt-24 text-center"
+        >
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="w-40 h-1 bg-gradient-to-r from-transparent via-purple-300 to-transparent"></span>
+            </div>
+            <h3 className="relative inline-block px-4 bg-gradient-to-br from-[#efe2fc] to-white text-xl font-medium text-gray-700">
+              Trusted by leaders
+            </h3>
+          </div>
+          
+          <blockquote className="mt-8 max-w-2xl mx-auto text-2xl text-gray-700 italic">
+            "SYMI Blueprint was the catalyst for a new era of growth in our business."
+          </blockquote>
+          
+          <div className="mt-4 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-purple-200 shadow-sm">
+              <img src="/assets/icons/cc11.png" alt="Customer" className="w-full h-full object-cover" />
+            </div>
+            <div className="ml-4 text-left">
+              <p className="font-semibold text-gray-800">Alea Chen</p>
+              <p className="text-sm text-gray-600">CEO, InnovateCloud</p>
+            </div>
+          </div>
+        </motion.div>
 
-          {/* <button
-            className="border-2 bg-[#5212ff] text-white px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse"
-            onClick={() => setShowPopup(true)}
-          >
-            Blueprint Vision
-          </button> */}
+        {/* Final CTA Section */}
+        <div className="mt-24">
+          <FinalCTA />
         </div>
       </div>
 
       {/* Popup with auto-scrolling image carousel */}
       {showPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-3xl w-full relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl shadow-2xl p-8 max-w-3xl w-full relative"
+          >
             <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-[#5212ff] transition-colors"
+              className="absolute top-4 right-4 text-gray-500 hover:text-purple-600 transition-colors z-10"
               onClick={() => setShowPopup(false)}
               aria-label="Close"
-              style={{ padding: 0, background: "none", border: "none" }}
             >
-              <span className="flex items-center justify-center rounded-full bg-gray-100 hover:bg-[#ece6ff] w-12 h-12 shadow-md transition-all">
-                <X size={32} className="text-[#5212ff]" />
+              <span className="flex items-center justify-center rounded-full bg-white hover:bg-purple-100 w-10 h-10 shadow-md transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-x"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
               </span>
             </button>
             <div className="flex flex-col items-center">
-              <img
+              <motion.img
+                key={currentIndex}
                 src={exampleImages[currentIndex]}
                 alt={`Example ${currentIndex + 1}`}
-                className="w-full h-[32rem] object-contain rounded-xl mb-4 transition-all duration-500"
+                className="w-full h-[32rem] object-contain rounded-xl mb-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
               />
+              <div className="flex justify-center space-x-2 mt-2">
+                {exampleImages.map((_, idx) => (
+                  <button
+                    key={idx}
+                    className={`w-3 h-3 rounded-full ${idx === currentIndex ? 'bg-purple-600' : 'bg-gray-300'}`}
+                    onClick={() => setCurrentIndex(idx)}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </section>
