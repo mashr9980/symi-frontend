@@ -250,7 +250,7 @@ export default function PricingSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-6">
             Simple, Transparent Pricing
           </h1>
           <p className="text-lg sm:text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
@@ -366,9 +366,7 @@ export default function PricingSection() {
                         )}
                       </button>
                     )}
-                    {isPopular && (
-                      <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3">No credit card required to start</p>
-                    )}
+                    <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3">No credit card required to start</p>
                   </div>
                 </div>
               </motion.div>
@@ -384,7 +382,7 @@ export default function PricingSection() {
           transition={{ duration: 0.8, delay: 0.6 }}
         >
           <div className="text-center mb-10">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-6">Frequently Asked Questions</h2>
+            <h2 className="text-4xl sm:text-5xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-6">Frequently Asked Questions</h2>
             <p className="text-gray-600 dark:text-gray-400">Have questions about our pricing? Find quick answers below.</p>
           </div>
           

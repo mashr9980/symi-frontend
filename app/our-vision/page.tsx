@@ -1,10 +1,10 @@
-// import VisionSection from '@/components/VisionSection'
-// import React from 'react'
+import VisionSection from '@/components/VisionSection'
+import React from 'react'
 
-// function page() {
-//   return (
-//   <VisionSection />
-//   )
-// }
+function page() {
+  return (
+  <VisionSection />
+  )
+}
 
-// export default page
+export default page
