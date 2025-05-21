@@ -2,7 +2,6 @@
 
 import { Play, Mail, Twitter, Instagram } from "lucide-react";
 import Link from "next/link";
-import { hasChatHistory } from "../utils/auth";
 
 export default function Footer() {
   return (
@@ -25,8 +24,9 @@ export default function Footer() {
           <div className="flex flex-col items-center sm:items-start">
             <h4 className="text-sm font-semibold text-gray-900 mb-4">Explore</h4>
             <ul className="space-y-2 text-sm text-gray-700">
+              {/* Home link always points to home page */}
               <li><Link 
-               href={hasChatHistory() ? "/blueprint" : "/"}
+               href="/"
               className="hover:underline">Home</Link></li>
               <li><Link href="/terms" className="hover:underline">Terms of Service</Link></li>
               <li><Link href="/privacy" className="hover:underline">Privacy Policy</Link></li>

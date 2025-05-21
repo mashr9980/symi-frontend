@@ -21,6 +21,7 @@ export default function HeroSection() {
   const [loading, setLoading] = useState(false);
   const [trialExpired, setTrialExpired] = useState(false);
   const [paymentData, setPaymentData] = useState<{ status: string | null, expiredStatus: boolean | null }>({ status: null, expiredStatus: null });
+  const [isAdminPopup, setIsAdminPopup] = useState(false);
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
 
@@ -65,19 +66,14 @@ export default function HeroSection() {
             const expiredStatus = paymentData?.expiredStatus;
 
             const userRole = getUserRole();
-            // Only redirect if NOT admin
-            if (userRole !== "admin") {
-              if (status === "premium" && expiredStatus === false) {
-                router.replace("/blueprint");
-                return;
-              } else if (status !== "premium" || expiredStatus === true) {
-                router.replace("/pricing");
-                return;
-              }
-              // Only show popup if not logged in or is admin
+            // Show appropriate popup based on user role
+            if (userRole === "admin") {
+              setIsAdminPopup(true); // Show admin-specific popup
+              setHasAskedSecondQuestion(true);
+            } else {
+              // Show trial expired popup for regular users
               setHasAskedSecondQuestion(true);
               setTrialExpired(true);
-              return;
             }
           })();
         }
@@ -85,7 +81,7 @@ export default function HeroSection() {
         // ignore
       }
     }
-  }, [router]);
+  }, []);
 
   // Helper to get user role and login status from cache/localStorage
   function getUserRole() {
@@ -116,26 +112,15 @@ export default function HeroSection() {
 
     // If first chat is done and user tries to send again
     if (chatHistory.length > 0) {
-      // 1. Check payment status from cache
-      const paymentData = await getPaymentStatusFromCache();
-      setPaymentData(paymentData);
-      const status = paymentData?.status;
-      const expiredStatus = paymentData?.expiredStatus;
-
+      // Show appropriate popup based on user role
       const userRole = getUserRole();
-      // Only redirect if NOT admin
-      if (userRole !== "admin") {
-        if (status === "premium" && expiredStatus === false) {
-          router.replace("/blueprint");
-          return;
-        } else if (status !== "premium" || expiredStatus === true) {
-          router.replace("/pricing");
-          return;
-        }
+      if (userRole === "admin") {
+        setIsAdminPopup(true);
+        setHasAskedSecondQuestion(true);
+      } else {
+        setHasAskedSecondQuestion(true);
+        setTrialExpired(true);
       }
-      // Only show popup if not logged in or is admin
-      setHasAskedSecondQuestion(true);
-      setTrialExpired(true);
       return;
     }
 
@@ -177,7 +162,7 @@ export default function HeroSection() {
   };
 
   // Don't disable input after first chat, only disable when loading or popup
-  const chatDisabled = loading || trialExpired;
+  const chatDisabled = loading || trialExpired || isAdminPopup;
 
   return (
     <div className="hero-section">
@@ -199,7 +184,7 @@ export default function HeroSection() {
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder={loading ? "Sending..." : "Type one sentence. We'll do the rest."}
+            placeholder={loading ? "Sending..." : "One sentence about who you are or what you're creating."}
             className={`text-gray-700 dark:text-gray-300 w-full pr-24 px-6 py-4 rounded-xl border border-gray-300 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3300fa] transition ${loading ? "bg-gray-100 text-gray-400" : ""}`}
             disabled={chatDisabled}
             onKeyDown={(e) => {
@@ -288,23 +273,49 @@ export default function HeroSection() {
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:max-w-md text-center">
             <h2 className="text-xl font-semibold mb-4">Trial Expired</h2>
             <p className="mb-6">
-              Your trial period has ended. If you want to proceed, please log in.
+              Your trial period has ended. If you want to proceed, please log in or upgrade your account.
             </p>
-            {getUserRole() === "admin" ? (
-              <button
-                onClick={() => setTrialExpired(false)}
-                className="px-6 py-2 bg-gray-400 text-white rounded-md font-semibold"
-              >
-                Close
-              </button>
-            ) : (
+            <div className="flex flex-col sm:flex-row justify-center gap-3">
               <button
                 onClick={() => router.push("/auth/login")}
                 className="px-6 py-2 bg-indigo-600 text-white rounded-md font-semibold"
               >
                 Login
               </button>
-            )}
+              <button
+                onClick={() => router.push("/pricing")}
+                className="px-6 py-2 bg-purple-600 text-white rounded-md font-semibold mt-2 sm:mt-0"
+              >
+                View Pricing
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin User Popup */}
+      {isAdminPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 text-gray-700 dark:text-gray-300 px-4">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:max-w-md text-center">
+            <h2 className="text-xl font-semibold mb-4">Admin Account Detected</h2>
+            <p className="mb-6">
+              Your account has admin privileges. Admin accounts cannot use the chat feature. 
+              If you want to use the chat, please sign up with a personal account.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-3">
+              <button
+                onClick={() => setIsAdminPopup(false)}
+                className="px-6 py-2 bg-gray-400 text-white rounded-md font-semibold"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => router.push("/auth/signup")}
+                className="px-6 py-2 bg-purple-600 text-white rounded-md font-semibold mt-2 sm:mt-0"
+              >
+                Sign Up
+              </button>
+            </div>
           </div>
         </div>
       )}

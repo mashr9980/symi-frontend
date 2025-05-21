@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Play, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { hasChatHistory, handleLogout } from "../utils/auth";
+import { handleLogout } from "../utils/auth";
 
 function Navbar() {
   const pathname = usePathname();
@@ -73,8 +73,9 @@ function Navbar() {
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-md' : 'bg-white/40 backdrop-blur-sm border-b border-white/20'}`}>
       <div className="relative max-w-screen-xl mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
+          {/* Always keep logo pointing to home page */}
           <Link 
-           href={hasChatHistory() ? "/blueprint" : "/"}
+           href="/"
            className="flex items-center space-x-2 relative group">
             <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full p-2 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-indigo-500/30">
               <Play

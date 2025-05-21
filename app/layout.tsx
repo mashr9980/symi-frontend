@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import FloatingCTA from "@/components/FloatingCTA";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import Chatbot from "@/components/Chatbot"; // 👈 Import Chatbot
+import Chatbot from "@/components/Chatbot"; 
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,7 +22,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <Navbar />
         {children}
-        {/* <Chatbot /> 👈 Floating chatbot added */}
+        {/* <Chatbot /> Floating chatbot added */}
         {/* <FloatingCTA /> */}
         <Footer />
       </body>
