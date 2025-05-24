@@ -66,7 +66,7 @@ export default function BlueprintV2() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 mt-8 leading-tight">
+          <h1 className="text-5xl sm:text-6xl lg:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 mt-12 mb-4 leading-tight">
             Your Blueprint<br className="md:hidden" /> Experience
           </h1>
           <p className="text-xl sm:text-2xl text-gray-700 max-w-3xl mx-auto">
@@ -75,56 +75,102 @@ export default function BlueprintV2() {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left Column */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="lg:order-1 order-2"
-          >
-            <div className="rounded-2xl bg-white/70 backdrop-blur-md shadow-xl p-8 border border-purple-100/50 hover:shadow-purple-200/50 transition-all duration-500">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800">What You'll Receive:</h2>
+        {/* Left Column */}
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="lg:order-1 order-2"
+        >
+          <div className="rounded-2xl bg-gradient-to-br from-white/20 to-indigo-50/30 backdrop-blur-md shadow-2xl p-8 border border-indigo-200/30 hover:shadow-indigo-200/40 hover:border-indigo-300/40 transition-all duration-500 group">
+            {/* Subtle background glow */}
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
+            <div className="relative z-10">
+              <h2 className="text-2xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-indigo-700 to-purple-700">
+                What You'll Receive:
+              </h2>
               
               <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-workflow"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><path d="M10 7h4v10h-4z"></path><path d="M7 10v4h10v-4z"></path></svg>
+                <div className="flex gap-4 group/item hover:transform hover:scale-105 transition-all duration-300">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 group-hover/item:shadow-indigo-500/50 transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-workflow">
+                      <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                      <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                      <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                      <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                      <path d="M10 7h4v10h-4z"></path>
+                      <path d="M7 10v4h10v-4z"></path>
+                    </svg>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800">Custom Architecture</h3>
-                    <p className="text-gray-600">Tailored system design that matches your unique workflow</p>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">
+                      Custom Architecture
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                      Your Personal Logic, Mapped
+                    </p>
                   </div>
                 </div>
                 
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-cog"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path><path d="M12 2v2"></path><path d="M12 22v-2"></path><path d="m17 20.66-1-1.73"></path><path d="M11 10.27 7 3.34"></path><path d="m20.66 17-1.73-1"></path><path d="m3.34 7 1.73 1"></path><path d="M14 12h8"></path><path d="M2 12h2"></path><path d="m20.66 7-1.73 1"></path><path d="m3.34 17 1.73-1"></path><path d="m17 3.34-1 1.73"></path><path d="m7 20.66 1-1.73"></path></svg>
+                <div className="flex gap-4 group/item hover:transform hover:scale-105 transition-all duration-300">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 group-hover/item:shadow-indigo-500/50 transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-cog">
+                      <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"></path>
+                      <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"></path>
+                      <path d="M12 2v2"></path>
+                      <path d="M12 22v-2"></path>
+                      <path d="m17 20.66-1-1.73"></path>
+                      <path d="M11 10.27 7 3.34"></path>
+                      <path d="m20.66 17-1.73-1"></path>
+                      <path d="m3.34 7 1.73 1"></path>
+                      <path d="M14 12h8"></path>
+                      <path d="M2 12h2"></path>
+                      <path d="m20.66 7-1.73 1"></path>
+                      <path d="m3.34 17 1.73-1"></path>
+                      <path d="m17 3.34-1 1.73"></path>
+                      <path d="m7 20.66 1-1.73"></path>
+                    </svg>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800">Built-in Automation</h3>
-                    <p className="text-gray-600">Systems that work even when you don't</p>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">
+                      Built-in Automation
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                      Automation That Breathes with You
+                    </p>
                   </div>
                 </div>
                 
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-line-chart"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
+                <div className="flex gap-4 group/item hover:transform hover:scale-105 transition-all duration-300">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 group-hover/item:shadow-indigo-500/50 transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-line-chart">
+                      <path d="M3 3v18h18"></path>
+                      <path d="m19 9-5 5-4-4-3 3"></path>
+                    </svg>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800">Scalable Framework</h3>
-                    <p className="text-gray-600">Grow without friction or technical debt</p>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">
+                      Scalable Framework
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                      Grow with Structure, Not Stress
+                    </p>
                   </div>
                 </div>
               </div>
               
+              {/* Enhanced CTA Button */}
               <button
                 onClick={handleStartBlueprint}
                 disabled={isLoading}
-                className="w-full mt-8 py-4 px-6 text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all duration-300 relative overflow-hidden group"
+                className="w-full mt-8 py-4 px-6 text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all duration-300 relative overflow-hidden group/button hover:scale-105"
               >
-                <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-90 transition-opacity"></span>
-                <span className="absolute -inset-px bg-gradient-to-r from-indigo-400 to-purple-400 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                <span className="relative">
+                {/* Animated background layers */}
+                <span className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-indigo-700 to-purple-700 opacity-0 group-hover/button:opacity-100 transition-opacity duration-300"></span>
+                <span className="absolute -inset-1 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-xl blur opacity-0 group-hover/button:opacity-75 transition-opacity duration-300"></span>
+                
+                <span className="relative flex items-center justify-center">
                   {isLoading ? (
                     <div className="flex items-center justify-center">
                       <svg className="animate-spin h-5 w-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -134,35 +180,54 @@ export default function BlueprintV2() {
                       Processing...
                     </div>
                   ) : (
-                    "Start with Blueprint"
+                    <div className="flex items-center gap-2">
+                      Start with Blueprint
+                      <svg className="w-5 h-5 transition-transform group-hover/button:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </div>
                   )}
                 </span>
               </button>
             </div>
-          </motion.div>
+          </div>
+        </motion.div>
 
-          {/* Right Column - Visual */}
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="lg:order-2 order-1 flex justify-center"
-          >
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-400/20 to-purple-500/20 rounded-full blur-3xl"></div>
-              <div className="relative z-10 bg-white/30 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-white/50 transform hover:rotate-2 transition-all duration-500">
-                <img
-                  src="/assets/icons/cc20.png"
-                  alt="Blueprint Visualization"
-                  className="w-full max-w-md h-auto rounded-xl transform hover:scale-105 transition-all duration-700"
-                />
-                <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
-                  <span className="transform -rotate-12">✓</span>
-                </div>
-              </div>
+        {/* Right Column - Visual */}
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="lg:order-2 order-1 flex justify-center"
+        >
+          <div className="relative group">
+            {/* Multiple layered background effects */}
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-400/20 to-purple-500/20 rounded-full blur-3xl group-hover:blur-2xl transition-all duration-700"></div>
+            <div className="absolute inset-0 bg-gradient-to-tl from-purple-400/10 to-indigo-400/10 rounded-full blur-2xl group-hover:scale-110 transition-all duration-700"></div>
+            
+            {/* Main image container */}
+            <div className="relative z-10 bg-gradient-to-br from-white/10 to-indigo-50/20 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-white/30 transform group-hover:rotate-1 group-hover:scale-105 transition-all duration-700">
+              {/* Inner glow effect */}
+              <div className="absolute inset-4 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              
+              <img
+                src="/assets/icons/cc20.png"
+                alt="System Architecture Visualization"
+                className="w-full max-w-md h-auto rounded-xl transform group-hover:scale-105 transition-all duration-700 relative z-10 shadow-lg"
+              />
+              
+              {/* Floating elements */}
+              <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full opacity-60 group-hover:opacity-100 group-hover:scale-125 transition-all duration-500"></div>
+              <div className="absolute -bottom-3 -left-3 w-4 h-4 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full opacity-40 group-hover:opacity-80 group-hover:scale-125 transition-all duration-700"></div>
+              <div className="absolute top-1/4 -right-4 w-3 h-3 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-full opacity-50 group-hover:opacity-90 group-hover:scale-150 transition-all duration-600"></div>
             </div>
-          </motion.div>
-        </div>
+            
+            {/* Orbiting elements */}
+            <div className="absolute top-1/3 -left-6 w-8 h-8 bg-gradient-to-br from-indigo-500/30 to-purple-600/30 rounded-full backdrop-blur border border-white/20 group-hover:animate-pulse transition-all duration-500"></div>
+            <div className="absolute bottom-1/4 -right-8 w-6 h-6 bg-gradient-to-br from-purple-500/30 to-indigo-600/30 rounded-full backdrop-blur border border-white/20 group-hover:animate-bounce transition-all duration-700"></div>
+          </div>
+        </motion.div>
+      </div>
 
         {/* Testimonial section */}
         <motion.div 
@@ -176,7 +241,7 @@ export default function BlueprintV2() {
               <span className="w-40 h-1 bg-gradient-to-r from-transparent via-purple-300 to-transparent"></span>
             </div>
             <h3 className="relative inline-block px-4 bg-gradient-to-br from-[#efe2fc] to-white text-xl font-medium text-gray-700">
-              Trusted by leaders
+              Built from real systems
             </h3>
           </div>
           

@@ -52,7 +52,7 @@ export default function SystemBuilder1() {
             {/* <span className="text-[#4c00ff] font-medium">System Builder</span> */}
           </motion.div>
           
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold text-black leading-tight">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-5xl font-semibold text-black leading-tight">
             Modern entrepreneurs &
             <span className="block bg-gradient-to-r from-[#4c00ff] to-[#8e70f9] text-transparent bg-clip-text">systems thinkers</span>
           </h1>
@@ -330,11 +330,3 @@ export default function SystemBuilder1() {
     </div>
   );
 }
-
-// export default function SystemBuilder() {
-//   return (
-//     <div className="bg-gradient-to-br from-[#F6F1FD] to-[#ECE6FB]">
-//       <SystemBuilder1 />
-//     </div>
-//   );
-// }

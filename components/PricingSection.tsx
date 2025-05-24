@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle, Sparkles, Clock, Shield } from "lucide-react";
+import { CheckCircle, Sparkles, Monitor, Route } from "lucide-react";
 import FinalCTA from "./FinalCTA";
 import Link from "next/link";
 import config from "../config";
@@ -245,12 +245,12 @@ export default function PricingSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 relative z-10">
         {/* Header */}
         <motion.div 
-          className="text-center mb-16 max-w-3xl mx-auto"
+          className="text-center mb-16 max-w-3xl mx-auto pt-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-4xl sm:text-5xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-5xl font-bold bg-clip-text mb-6 pb-1 text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-6">
             Simple, Transparent Pricing
           </h1>
           <p className="text-lg sm:text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
@@ -276,47 +276,66 @@ export default function PricingSection() {
                 transition={{ duration: 0.8, delay: 0.3 + index * 0.1 }}
                 className="group relative rounded-2xl overflow-hidden transition-all duration-500 h-full"
               >
+                {/* Popular Badge */}
                 {isPopular && (
-                  <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 text-white text-center py-1 text-sm font-medium z-10">
-                    Most Popular
+                  <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-center py-2 text-sm font-medium z-10 shadow-lg">
+                    <div className="flex items-center justify-center gap-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                      Most Popular
+                    </div>
                   </div>
                 )}
 
-                <div className={`flex flex-col h-full bg-white/80 dark:bg-gray-800/90 backdrop-blur-md border transition-all duration-300 ${
+                {/* Card Container with Glass Effect */}
+                <div className={`flex flex-col h-full transition-all duration-500 relative ${
                   isActive 
-                    ? 'border-indigo-400 shadow-xl shadow-indigo-200/50 dark:shadow-indigo-900/20' 
-                    : 'border-purple-200 dark:border-purple-900/40 shadow-xl'
-                } ${isPopular ? 'pt-10' : 'pt-6'} rounded-2xl overflow-hidden`}>
+                    ? 'bg-gradient-to-br from-indigo-500/20 to-purple-500/20 backdrop-blur-md border-2 border-indigo-400/50 shadow-2xl shadow-indigo-500/20' 
+                    : isPopular
+                    ? 'bg-gradient-to-br from-white/80 to-indigo-50/80 backdrop-blur-md border-2 border-indigo-200/50 shadow-xl shadow-indigo-500/10 hover:shadow-2xl hover:shadow-indigo-500/20'
+                    : 'bg-gradient-to-br from-white/60 to-purple-50/60 backdrop-blur-md border border-purple-200/30 shadow-lg hover:shadow-xl hover:shadow-purple-500/10'
+                } ${isPopular ? 'pt-12' : 'pt-6'} rounded-2xl group-hover:scale-105 group-hover:-translate-y-2`}>
                   
+                  {/* Active Plan Badge */}
                   {isActive && (
-                    <div className="absolute -top-3 -right-3 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                      Current Plan
+                    <div className="absolute -top-3 -right-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg z-10">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        Current Plan
+                      </div>
                     </div>
                   )}
                   
                   {/* Plan Header */}
-                  <div className="px-6 py-4 text-center border-b border-gray-100 dark:border-gray-700">
+                  <div className="px-6 py-6 text-center border-b border-white/20">
                     <div className="w-16 h-16 mx-auto mb-4 relative">
-                      <div className="absolute inset-0 rounded-full bg-purple-100 dark:bg-purple-900/40"></div>
+                      <div className={`absolute inset-0 rounded-full ${
+                        isPopular 
+                          ? 'bg-gradient-to-br from-indigo-100 to-purple-100' 
+                          : 'bg-gradient-to-br from-purple-100/80 to-indigo-100/80'
+                      } shadow-inner`}></div>
                       <div className="absolute inset-0 flex items-center justify-center">
                         {index === 0 ? (
                           <Sparkles className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                         ) : index === 1 ? (
-                          <Clock className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                          <Route className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                         ) : (
-                          <Shield className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                          <Monitor className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                         )}
                       </div>
                     </div>
                     <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{plan.name}</h2>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm min-h-[40px]">{plan.description}</p>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm min-h-[40px] leading-relaxed">{plan.description}</p>
                     
                     <div className="mt-6 mb-4">
                       <div className="flex items-center justify-center gap-1">
-                        <span className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+                        <span className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
                           {plan.currency === 'eur' ? '€' : '$'}{displayPrice}
                         </span>
-                        <span className="text-gray-500 dark:text-gray-400 text-sm">/ month</span>
+                        <span className="text-gray-500 dark:text-gray-400 text-sm self-end mb-2">/ month</span>
                       </div>
                     </div>
                   </div>
@@ -326,34 +345,44 @@ export default function PricingSection() {
                     <ul className="space-y-4">
                       {plan.features.map((feature: string, i: number) => (
                         <li key={i} className="flex items-start gap-3">
-                          <CheckCircle className="w-5 h-5 mt-0.5 flex-shrink-0 text-purple-600 dark:text-purple-400" />
-                          <span className="text-gray-700 dark:text-gray-300 text-sm">{feature}</span>
+                          <div className="flex-shrink-0 w-5 h-5 mt-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <span className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">{feature}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                   
                   {/* Action area */}
-                  <div className="p-6 pt-2 border-t border-gray-100 dark:border-gray-700">
+                  <div className="p-6 pt-2 border-t border-white/10">
                     {isActive ? (
                       <Link 
                         href="/prompt" 
-                        className="w-full bg-gradient-to-r from-green-500 to-emerald-600 dark:from-green-600 dark:to-emerald-700 hover:from-green-600 hover:to-emerald-700 text-white px-4 py-3 rounded-xl font-medium transition-all text-center flex items-center justify-center shadow-md shadow-green-600/20 dark:shadow-green-900/20"
+                        className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-4 py-3 rounded-xl font-medium transition-all text-center flex items-center justify-center shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:scale-105"
                       >
-                        <CheckCircle className="w-5 h-5 mr-2" />
+                        <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
                         Access Your Blueprint
                       </Link>
                     ) : (
                       <button
                         onClick={() => handleCheckout(plan.id)}
-                        className={`w-full relative bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-3 rounded-xl font-medium transition-all shadow-md shadow-purple-600/20 dark:shadow-purple-900/20 ${
-                          !isSelectable ? 'opacity-50 cursor-not-allowed' : ''
+                        className={`w-full relative overflow-hidden rounded-xl font-medium py-3 px-4 transition-all shadow-lg ${
+                          !isSelectable 
+                            ? 'opacity-50 cursor-not-allowed bg-gray-300 text-gray-500' 
+                            : isPopular
+                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-105'
+                            : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-105'
                         }`}
                         disabled={!isSelectable || processingPlan === plan.id}
                       >
                         {processingPlan === plan.id ? (
                           <>
-                            <span className="opacity-0">Start this Plan</span>
+                            <span className="opacity-0">Get Started</span>
                             <span className="absolute inset-0 flex items-center justify-center">
                               <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -362,11 +391,16 @@ export default function PricingSection() {
                             </span>
                           </>
                         ) : (
-                          <>Get Started</>
+                          <span className="flex items-center justify-center gap-2">
+                            Get Started
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                          </span>
                         )}
                       </button>
                     )}
-                    <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3">No credit card required to start</p>
+                    <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3 opacity-80">No credit card required to start</p>
                   </div>
                 </div>
               </motion.div>

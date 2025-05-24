@@ -107,8 +107,30 @@ export default function HeroSection() {
   }
 
   // Connect and send message via WebSocket
+  // Helper function to format AI response content - more compact
+  const formatAIContent = (content: string) => {
+    return content
+      // Convert markdown headers to more compact HTML
+      .replace(/### \*\*(.*?)\*\*/g, '<div class="text-base font-semibold text-purple-600 dark:text-purple-400 mt-3 mb-2">$1</div>')
+      .replace(/## 🎯 \*\*(.*?)\*\*/g, '<div class="text-lg font-bold text-indigo-600 dark:text-indigo-400 mb-3">🎯 $1</div>')
+      .replace(/\*\*(.*?)\*\*/g, '<span class="font-medium text-gray-800 dark:text-gray-200">$1</span>')
+      // Convert bullet points to compact list items
+      .replace(/• (.*?)(?=\n|$)/g, '<div class="flex items-start mb-1"><span class="text-purple-500 mr-2">•</span><span class="text-sm">$1</span></div>')
+      // Convert line breaks to minimal spacing
+      .replace(/\n\n/g, '<div class="mb-2"></div>')
+      .replace(/\n/g, '<br>')
+      // Style the horizontal rule as subtle divider
+      .replace(/---/g, '<div class="border-t border-gray-200 dark:border-gray-700 my-3"></div>')
+      // Keep emojis normal size
+      .replace(/(📊|🤖|📈|💰)/g, '$1');
+  };
+
+  // Connect and send message via WebSocket
   const handleChatSend = async () => {
     if (!inputText.trim() || loading) return;
+
+    // Store the current input before clearing
+    const userQuestion = inputText;
 
     // If first chat is done and user tries to send again
     if (chatHistory.length > 0) {
@@ -126,6 +148,7 @@ export default function HeroSection() {
 
     setLoading(true);
     setChatStarted(true);
+    setInputText(""); // Clear input immediately
 
     if (chatHistory.length === 0) {
       // Open WebSocket connection if not already open
@@ -133,30 +156,59 @@ export default function HeroSection() {
         wsRef.current = new WebSocket(config.webSocketUrlHome);
 
         wsRef.current.onopen = () => {
-          wsRef.current?.send(inputText);
+          wsRef.current?.send(userQuestion);
         };
 
         wsRef.current.onmessage = (event) => {
-          const aiMessage = extractMessage(event.data);
-          const chat = [{ user: inputText, ai: aiMessage }];
-          setChatHistory(chat);
-          setLoading(false);
+          try {
+            // Parse the JSON message from WebSocket
+            const messageData = JSON.parse(event.data);
+            
+            // Handle different message types
+            if (messageData.type === "message") {
+              const aiMessage = messageData.content;
+              const chat = [{ user: userQuestion, ai: aiMessage }];
+              setChatHistory(chat);
+              setLoading(false);
 
-          // Save to localStorage
-          if (typeof window !== "undefined") {
-            localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chat));
+              // Save to localStorage
+              if (typeof window !== "undefined") {
+                localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chat));
+              }
+
+              // Don't show popup automatically - wait for user's second question attempt
+            } else if (messageData.type === "thinking") {
+              // Handle thinking state
+              console.log("AI is thinking:", messageData.message);
+            } else if (messageData.type === "complete") {
+              // Close WebSocket when demo is complete
+              wsRef.current?.close();
+            } else if (messageData.type === "error") {
+              // Handle error messages
+              const chat = [{ user: userQuestion, ai: messageData.message || "Sorry, there was an error." }];
+              setChatHistory(chat);
+              setLoading(false);
+              wsRef.current?.close();
+            }
+          } catch (error) {
+            // Fallback for non-JSON messages (if any)
+            const aiMessage = event.data;
+            const chat = [{ user: userQuestion, ai: aiMessage }];
+            setChatHistory(chat);
+            setLoading(false);
+            wsRef.current?.close();
           }
-
-          wsRef.current?.close();
         };
 
         wsRef.current.onerror = () => {
-          setChatHistory([{ user: inputText, ai: "Sorry, there was a connection error." }]);
+          setChatHistory([{ user: userQuestion, ai: "Sorry, there was a connection error. Please try again." }]);
+          setLoading(false);
+          wsRef.current?.close();
+        };
+
+        wsRef.current.onclose = () => {
           setLoading(false);
         };
-      } else {
-        wsRef.current.send(inputText);
-        setInputText("");
       }
     }
   };
@@ -228,38 +280,53 @@ export default function HeroSection() {
         </p>
 
         {/* Chat Section */}
-        <div className="w-full max-w-xl mx-auto mt-8">
-          {(chatHistory.length > 0 || loading) && (
-            <div className="bg-white/80 dark:bg-gray-900/60 rounded-xl shadow p-4 sm:p-6 mb-4 text-left text-gray-700 dark:text-gray-300">
-              <div className="mb-2 flex items-center">
-                <span className="font-semibold text-indigo-700 dark:text-indigo-300">You:</span>
-                <span className="ml-2 flex items-center">
-                  {chatHistory.length > 0 ? chatHistory[0].user : inputText}
-                  {loading && (
-                    <span className="inline-flex items-center ml-2">
-                      <svg className="animate-spin h-5 w-5 mr-1 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                      </svg>
-                      Sending...
-                    </span>
-                  )}
-                </span>
-              </div>
-              <div>
-                <span className="font-semibold text-purple-700 dark:text-purple-300">SYMI:</span>
-                <span className="ml-2">
-                  {chatHistory[0]?.ai}
-                </span>
-              </div>
-              <div className="text-xs text-gray-400 mt-2">
-                {loading
-                  ? "SYMI is thinking..."
-                  : "Chat is limited to one question. To continue, try asking another question."}
-              </div>
+        <div className="w-full max-w-2xl mx-auto mt-6">
+      {(chatHistory.length > 0 || loading) && (
+        <div className="bg-white/80 dark:bg-gray-900/60 rounded-xl shadow p-4 text-left text-gray-700 dark:text-gray-300">
+          {/* User Question - Compact */}
+          <div className="mb-3">
+            <div className="flex items-start">
+              <span className="font-semibold text-indigo-700 dark:text-indigo-300 mr-2 text-sm">You:</span>
+              <span className="text-sm flex-1">
+                {chatHistory.length > 0 ? chatHistory[0].user : inputText}
+              </span>
             </div>
-          )}
+          </div>
+
+          {/* AI Response - Compact */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+            <div className="flex items-start mb-2">
+              <span className="font-semibold text-purple-700 dark:text-purple-300 mr-2 text-sm">SYMI:</span>
+              {loading && (
+                <div className="flex items-center">
+                  <svg className="animate-spin h-4 w-4 mr-2 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                  </svg>
+                  <span className="text-purple-500 text-xs">Analyzing...</span>
+                </div>
+              )}
+            </div>
+            
+            {chatHistory[0]?.ai && (
+              <div 
+                className="text-sm leading-relaxed max-h-96 overflow-y-auto"
+                dangerouslySetInnerHTML={{ 
+                  __html: formatAIContent(chatHistory[0].ai) 
+                }}
+              />
+            )}
+          </div>
+
+          {/* Status - Very compact */}
+          <div className="text-xs text-gray-400 mt-3 pt-2 border-t border-gray-100 dark:border-gray-800">
+            {loading
+              ? "🧠 SYMI is thinking..."
+              : "✨ This was your free demo. Ask another question to see upgrade options."}
+          </div>
         </div>
+      )}
+    </div>
 
         {/* Final CTA */}
         <div className="mt-16">

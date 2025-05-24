@@ -16,7 +16,7 @@ export default function Footer() {
               <span className="text-xl font-bold tracking-tight">SYMI</span>
             </div>
             <p className="text-sm text-gray-700 leading-relaxed max-w-xs">
-              Intelligent Business Automation tailored to scale.<br />
+              Build once, Grow always<br />
             </p>
           </div>
 
