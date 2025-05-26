@@ -315,7 +315,7 @@ export default function SystemBuilder1() {
             </div>
           </div>
           
-          <div className="relative">
+          {/* <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-[#4c00ff]/10 to-[#8e70f9]/20 rounded-3xl blur-xl"></div>
             <div className="relative bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-purple-100/30">
               <img 
@@ -324,7 +324,7 @@ export default function SystemBuilder1() {
                 className="w-full h-auto"
               />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
