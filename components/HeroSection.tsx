@@ -106,7 +106,6 @@ export default function HeroSection() {
     }
   }
 
-  // Connect and send message via WebSocket
   // Helper function to format AI response content - more compact
   const formatAIContent = (content: string) => {
     return content
@@ -217,141 +216,154 @@ export default function HeroSection() {
   const chatDisabled = loading || trialExpired || isAdminPopup;
 
   return (
-    <div className="hero-section">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#efe2fc] to-white -z-10"></div>
+    <div className="w-full min-h-screen bg-gradient-to-br from-[#efe2fc] to-white dark:from-gray-900 dark:via-gray-800 dark:to-purple-900/30">
+      {/* Decorative elements - similar to SYMI Lab */}
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-br from-purple-500/10 to-pink-500/20 rounded-3xl blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/3 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-blue-500/5 to-purple-500/15 rounded-full blur-2xl pointer-events-none" />
+      
+      <div className="max-w-screen-xl mx-auto px-4 py-16 pt-32 relative z-10">
+        <motion.div
+          className="max-w-3xl mx-auto"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+        >
+          {/* Hero Title */}
+          <h1 className={`hero-headline text-black dark:text-white ${isMobile ? 'text-3xl' : 'text-[4rem]'} font-bold leading-tight text-center mb-6 letter-spacing:-0.05em`}>
+            What are you building today?
+          </h1>
 
-      <div className="breathe-overlay max-w-3xl w-full text-center relative z-10 mt-4 sm:mt-32 px-4 sm:px-0">
-        {/* Hero Title */}
-        <h1 className={`hero-headline text-black ${isMobile ? 'text-3xl' : 'text-[4rem]'} font-bold leading-tight text-center mb-6 letter-spacing:-0.05em`}>
-          What are you building today?
-        </h1>
-
-        {/* Extra Blur Bubble */}
-        <div className="absolute w-44 h-44 bg-purple-500/40 blur-2xl rounded-full z-0" />
-
-        {/* Input Section */}
-        <div className="w-full relative sacred-input-container">
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder={loading ? "Sending..." : "One sentence about who you are or what you're creating."}
-            className={`text-gray-700 dark:text-gray-300 w-full pr-24 px-6 py-4 rounded-xl border border-gray-300 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3300fa] transition ${loading ? "bg-gray-100 text-gray-400" : ""}`}
-            disabled={chatDisabled}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleChatSend();
-            }}
-          />
-          {loading && (
-            <span className="absolute right-24 top-1/2 -translate-y-1/2 flex items-center">
-              <svg className="animate-spin h-5 w-5 mr-2 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-              </svg>
-              <span className="text-purple-500 text-sm">Sending...</span>
-            </span>
-          )}
-
-          {/* Image Upload */}
-          <motion.button
-            className="absolute right-14 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-gray-100 transition"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={chatDisabled}
-          >
-            <ImageIcon className="w-6 h-6 text-sacred-ash" />
-            <input ref={fileInputRef} type="file" hidden accept="image/*" />
-          </motion.button>
-
-          {/* Send Button */}
-          <motion.button
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-sacred-ash text-sacred-ground rounded-full"
-            onClick={handleChatSend}
-            disabled={chatDisabled}
-          >
-            <Send className="w-6 h-6" />
-          </motion.button>
-        </div>
-
-        {/* Flow Diagram */}
-        <Diagram />
-        <p className="hero-subhead text-gray-500 mb-6 text-base sm:text-xl">
-          We architect systems that scale like your ambition.
-        </p>
-
-        {/* Chat Section */}
-        <div className="w-full max-w-2xl mx-auto mt-6">
-      {(chatHistory.length > 0 || loading) && (
-        <div className="bg-white/80 dark:bg-gray-900/60 rounded-xl shadow p-4 text-left text-gray-700 dark:text-gray-300">
-          {/* User Question - Compact */}
-          <div className="mb-3">
-            <div className="flex items-start">
-              <span className="font-semibold text-indigo-700 dark:text-indigo-300 mr-2 text-sm">You:</span>
-              <span className="text-sm flex-1">
-                {chatHistory.length > 0 ? chatHistory[0].user : inputText}
+          {/* Input Section */}
+          <div className="w-full relative sacred-input-container mb-8">
+            <input
+              type="text"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder={loading ? "Sending..." : "One sentence about who you are or what you're creating."}
+              className={`text-gray-700 dark:text-gray-300 w-full pr-24 px-6 py-4 rounded-xl border border-gray-300 dark:border-gray-600 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3300fa] transition bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm ${loading ? "bg-gray-100 text-gray-400" : ""}`}
+              disabled={chatDisabled}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleChatSend();
+              }}
+            />
+            {loading && (
+              <span className="absolute right-24 top-1/2 -translate-y-1/2 flex items-center">
+                <svg className="animate-spin h-5 w-5 mr-2 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+                <span className="text-purple-500 text-sm">Sending...</span>
               </span>
-            </div>
+            )}
+
+            {/* Image Upload */}
+            <motion.button
+              className="absolute right-14 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={chatDisabled}
+            >
+              <ImageIcon className="w-6 h-6 text-sacred-ash dark:text-gray-400" />
+              <input ref={fileInputRef} type="file" hidden accept="image/*" />
+            </motion.button>
+
+            {/* Send Button */}
+            <motion.button
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-sacred-ash dark:bg-purple-600 text-sacred-ground dark:text-white rounded-full hover:bg-opacity-80 transition"
+              onClick={handleChatSend}
+              disabled={chatDisabled}
+            >
+              <Send className="w-6 h-6" />
+            </motion.button>
           </div>
 
-          {/* AI Response - Compact */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
-            <div className="flex items-start mb-2">
-              <span className="font-semibold text-purple-700 dark:text-purple-300 mr-2 text-sm">SYMI:</span>
-              {loading && (
-                <div className="flex items-center">
-                  <svg className="animate-spin h-4 w-4 mr-2 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                  </svg>
-                  <span className="text-purple-500 text-xs">Analyzing...</span>
+          {/* Flow Diagram */}
+          <div className="mb-8">
+            <Diagram />
+          </div>
+          
+          <p className="hero-subhead text-gray-500 dark:text-gray-400 mb-6 text-base sm:text-xl text-center">
+            We architect systems that scale like your ambition.
+          </p>
+
+          {/* Chat Section */}
+          <div className="w-full max-w-2xl mx-auto mt-6">
+            {(chatHistory.length > 0 || loading) && (
+              <div className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg p-6 text-left text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-700">
+                {/* User Question - Compact */}
+                <div className="mb-4">
+                  <div className="flex items-start">
+                    <span className="font-semibold text-indigo-700 dark:text-indigo-300 mr-2 text-sm">You:</span>
+                    <span className="text-sm flex-1">
+                      {chatHistory.length > 0 ? chatHistory[0].user : inputText}
+                    </span>
+                  </div>
                 </div>
-              )}
-            </div>
-            
-            {chatHistory[0]?.ai && (
-              <div 
-                className="text-sm leading-relaxed max-h-96 overflow-y-auto"
-                dangerouslySetInnerHTML={{ 
-                  __html: formatAIContent(chatHistory[0].ai) 
-                }}
-              />
+
+                {/* AI Response - Compact */}
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <div className="flex items-start mb-2">
+                    <span className="font-semibold text-purple-700 dark:text-purple-300 mr-2 text-sm">SYMI:</span>
+                    {loading && (
+                      <div className="flex items-center">
+                        <svg className="animate-spin h-4 w-4 mr-2 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                        </svg>
+                        <span className="text-purple-500 text-xs">Analyzing...</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {chatHistory[0]?.ai && (
+                    <div 
+                      className="text-sm leading-relaxed max-h-96 overflow-y-auto"
+                      dangerouslySetInnerHTML={{ 
+                        __html: formatAIContent(chatHistory[0].ai) 
+                      }}
+                    />
+                  )}
+                </div>
+
+                {/* Status - Very compact */}
+                <div className="text-xs text-gray-400 mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
+                  {loading
+                    ? "🧠 SYMI is thinking..."
+                    : "✨ This was your free demo. Ask another question to see upgrade options."}
+                </div>
+              </div>
             )}
           </div>
-
-          {/* Status - Very compact */}
-          <div className="text-xs text-gray-400 mt-3 pt-2 border-t border-gray-100 dark:border-gray-800">
-            {loading
-              ? "🧠 SYMI is thinking..."
-              : "✨ This was your free demo. Ask another question to see upgrade options."}
-          </div>
-        </div>
-      )}
-    </div>
+        </motion.div>
 
         {/* Final CTA */}
-        <div className="mt-16">
+        <motion.div
+          className="mt-20 max-w-3xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.8 }}
+        >
           <FinalCTA />
-        </div>
+        </motion.div>
       </div>
 
       {/* Trial Expired Popup */}
       {trialExpired && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 text-gray-700 dark:text-gray-300 px-4">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:max-w-md text-center">
-            <h2 className="text-xl font-semibold mb-4">Trial Expired</h2>
-            <p className="mb-6">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-sm sm:max-w-md text-center border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Trial Expired</h2>
+            <p className="mb-6 text-gray-600 dark:text-gray-300">
               Your trial period has ended. If you want to proceed, please log in or upgrade your account.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-3">
               <button
                 onClick={() => router.push("/auth/login")}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-md font-semibold"
+                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-semibold transition"
               >
                 Login
               </button>
               <button
                 onClick={() => router.push("/pricing")}
-                className="px-6 py-2 bg-purple-600 text-white rounded-md font-semibold mt-2 sm:mt-0"
+                className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md font-semibold mt-2 sm:mt-0 transition"
               >
                 View Pricing
               </button>
@@ -363,22 +375,22 @@ export default function HeroSection() {
       {/* Admin User Popup */}
       {isAdminPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 text-gray-700 dark:text-gray-300 px-4">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm sm:max-w-md text-center">
-            <h2 className="text-xl font-semibold mb-4">Admin Account Detected</h2>
-            <p className="mb-6">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-sm sm:max-w-md text-center border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Admin Account Detected</h2>
+            <p className="mb-6 text-gray-600 dark:text-gray-300">
               Your account has admin privileges. Admin accounts cannot use the chat feature. 
               If you want to use the chat, please sign up with a personal account.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-3">
               <button
                 onClick={() => setIsAdminPopup(false)}
-                className="px-6 py-2 bg-gray-400 text-white rounded-md font-semibold"
+                className="px-6 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md font-semibold transition"
               >
                 Close
               </button>
               <button
                 onClick={() => router.push("/auth/signup")}
-                className="px-6 py-2 bg-purple-600 text-white rounded-md font-semibold mt-2 sm:mt-0"
+                className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md font-semibold mt-2 sm:mt-0 transition"
               >
                 Sign Up
               </button>

@@ -263,7 +263,7 @@ export default function PricingSection() {
           {plans.map((plan, index) => {
             const isActive = activePlanId === Number(plan.id) && isPremium;
             const isSelectable = canSelectPlan(plan);
-            const isPopular = index === 0; // First plan is the popular one
+            const isPopular = index === 1; // First plan is the popular one
             
             // Display the regular price
             const displayPrice = plan.price;
@@ -409,7 +409,7 @@ export default function PricingSection() {
         </div>
 
         {/* FAQ Section */}
-        <motion.div 
+        {/* <motion.div 
           className="max-w-3xl mx-auto mt-20"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -442,7 +442,7 @@ export default function PricingSection() {
               View all FAQs <span className="ml-1">→</span>
             </Link>
           </div>
-        </motion.div>
+        </motion.div> */}
 
         {/* Footer */}
         <div className="mt-16">

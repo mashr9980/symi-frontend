@@ -249,7 +249,7 @@ export default function BlueprintV2() {
             "SYMI Blueprint was the catalyst for a new era of growth in our business."
           </blockquote>
           
-          <div className="mt-4 flex items-center justify-center">
+          {/* <div className="mt-4 flex items-center justify-center">
             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-purple-200 shadow-sm">
               <img src="/assets/icons/cc11.png" alt="Customer" className="w-full h-full object-cover" />
             </div>
@@ -257,7 +257,7 @@ export default function BlueprintV2() {
               <p className="font-semibold text-gray-800">Alea Chen</p>
               <p className="text-sm text-gray-600">CEO, InnovateCloud</p>
             </div>
-          </div>
+          </div> */}
         </motion.div>
 
         {/* Final CTA Section */}
