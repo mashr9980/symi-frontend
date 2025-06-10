@@ -236,18 +236,18 @@ export default function BlueprintV2() {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="mt-24 text-center"
         >
-          <div className="relative">
+          {/* <div className="relative">
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="w-40 h-1 bg-gradient-to-r from-transparent via-purple-300 to-transparent"></span>
             </div>
             <h3 className="relative inline-block px-4 bg-gradient-to-br from-[#efe2fc] to-white text-xl font-medium text-gray-700">
               Built from real systems
             </h3>
-          </div>
+          </div> */}
           
-          <blockquote className="mt-8 max-w-2xl mx-auto text-2xl text-gray-700 italic">
+          {/* <blockquote className="mt-8 max-w-2xl mx-auto text-2xl text-gray-700 italic">
             "SYMI Blueprint was the catalyst for a new era of growth in our business."
-          </blockquote>
+          </blockquote> */}
           
           {/* <div className="mt-4 flex items-center justify-center">
             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-purple-200 shadow-sm">

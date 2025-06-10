@@ -1,9 +1,11 @@
+// components/SymiLab.tsx
 "use client";
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Head from "next/head";
+import JoinLabDialog from "./JoinLabDialog";
 
 // Project data
 const projects = [
@@ -79,6 +81,7 @@ Synthesis is how you remember what you already knew.`
 
 export default function SymiLab() {
   const [activeProject, setActiveProject] = useState<number | null>(null);
+  const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-white via-purple-50 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900/30">
@@ -262,14 +265,20 @@ export default function SymiLab() {
           <p className="text-gray-700 dark:text-gray-300 mb-6">
             Interested in collaborating on experimental systems? We're always looking for visionary thinkers.
           </p>
-          <Link 
-            href="/blueprint"
-            className="inline-block bg-[#4C00FF] text-white px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse"
+          <button
+            onClick={() => setIsJoinDialogOpen(true)}
+            className="inline-block bg-[#4C00FF] text-white px-8 py-4 rounded-2xl text-lg transition-all hover:animate-pulse hover:scale-105 shadow-lg shadow-purple-500/25"
           >
-            Start with a Blueprint
-          </Link>
+            Join the Lab
+          </button>
         </motion.div>
       </div>
+
+      {/* Join Lab Dialog */}
+      <JoinLabDialog 
+        isOpen={isJoinDialogOpen} 
+        onClose={() => setIsJoinDialogOpen(false)} 
+      />
     </div>
   );
 }

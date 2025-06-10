@@ -242,7 +242,7 @@ export default function SystemBuilder1() {
               />
             </div>
             <blockquote className="text-xl sm:text-2xl text-gray-800 text-center italic font-serif mb-6">
-              "SYMI System Builder is not software — it's a structural shift."
+              "SYMI System Builder is not software — it's a structural shift"
             </blockquote>
             {/* <div className="text-center">
               <p className="font-medium text-gray-900">Alea Chen</p>

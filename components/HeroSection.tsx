@@ -22,6 +22,8 @@ export default function HeroSection() {
   const [trialExpired, setTrialExpired] = useState(false);
   const [paymentData, setPaymentData] = useState<{ status: string | null, expiredStatus: boolean | null }>({ status: null, expiredStatus: null });
   const [isAdminPopup, setIsAdminPopup] = useState(false);
+  const [showTrialMessage, setShowTrialMessage] = useState(false);
+  const [showAdminMessage, setShowAdminMessage] = useState(false);
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
 
@@ -66,14 +68,14 @@ export default function HeroSection() {
             const expiredStatus = paymentData?.expiredStatus;
 
             const userRole = getUserRole();
-            // Show appropriate popup based on user role
+            // Show appropriate message based on user role
             if (userRole === "admin") {
-              setIsAdminPopup(true); // Show admin-specific popup
+              setShowAdminMessage(true);
               setHasAskedSecondQuestion(true);
             } else {
-              // Show trial expired popup for regular users
+              // Show trial expired message for regular users
               setHasAskedSecondQuestion(true);
-              setTrialExpired(true);
+              setShowTrialMessage(true);
             }
           })();
         }
@@ -133,15 +135,16 @@ export default function HeroSection() {
 
     // If first chat is done and user tries to send again
     if (chatHistory.length > 0) {
-      // Show appropriate popup based on user role
+      // Show appropriate message based on user role
       const userRole = getUserRole();
       if (userRole === "admin") {
-        setIsAdminPopup(true);
+        setShowAdminMessage(true);
         setHasAskedSecondQuestion(true);
       } else {
         setHasAskedSecondQuestion(true);
-        setTrialExpired(true);
+        setShowTrialMessage(true);
       }
+      setInputText(""); // Clear input
       return;
     }
 
@@ -212,8 +215,8 @@ export default function HeroSection() {
     }
   };
 
-  // Don't disable input after first chat, only disable when loading or popup
-  const chatDisabled = loading || trialExpired || isAdminPopup;
+  // Don't disable input after first chat, only disable when loading
+  const chatDisabled = loading;
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-[#efe2fc] to-white dark:from-gray-900 dark:via-gray-800 dark:to-purple-900/30">
@@ -276,6 +279,66 @@ export default function HeroSection() {
             </motion.button>
           </div>
 
+          {/* Trial Expired Floating Message */}
+          {showTrialMessage && (
+            <motion.div 
+              className="bg-gradient-to-r from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20 border border-orange-200 dark:border-orange-700 rounded-2xl p-4 mb-6 backdrop-blur-sm shadow-lg"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+              <div className="text-center">
+                <p className="text-orange-800 dark:text-orange-200 font-medium mb-3 text-sm">
+                  Your trial has ended. Please log in or upgrade your account to continue.
+                </p>
+                <div className="flex flex-col sm:flex-row justify-center gap-3">
+                  <button
+                    onClick={() => router.push("/auth/login")}
+                    className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-lg font-medium transition-all duration-200 text-sm shadow-sm"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => router.push("/pricing")}
+                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg font-medium transition-all duration-200 text-sm shadow-sm"
+                  >
+                    View Pricing
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Admin Floating Message */}
+          {showAdminMessage && (
+            <motion.div 
+              className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/20 border border-blue-200 dark:border-blue-700 rounded-2xl p-4 mb-6 backdrop-blur-sm shadow-lg"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+              <div className="text-center">
+                <p className="text-blue-800 dark:text-blue-200 font-medium mb-3 text-sm">
+                  Admin accounts cannot use the chat feature. Please sign up with a personal account to use chat.
+                </p>
+                <div className="flex flex-col sm:flex-row justify-center gap-3">
+                  <button
+                    onClick={() => setShowAdminMessage(false)}
+                    className="px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white rounded-lg font-medium transition-all duration-200 text-sm shadow-sm"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={() => router.push("/auth/signup")}
+                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg font-medium transition-all duration-200 text-sm shadow-sm"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Flow Diagram */}
           <div className="mb-8">
             <Diagram />
@@ -332,6 +395,52 @@ export default function HeroSection() {
                 </div>
               </div>
             )}
+
+            {/* Trial Expired Message */}
+            {showTrialMessage && (
+              <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4 mt-4 text-center">
+                <p className="text-orange-800 dark:text-orange-200 font-medium mb-3">
+                  Your trial has ended. Please log in or upgrade your account to continue.
+                </p>
+                <div className="flex flex-col sm:flex-row justify-center gap-3">
+                  <button
+                    onClick={() => router.push("/auth/login")}
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium transition text-sm"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => router.push("/pricing")}
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md font-medium transition text-sm"
+                  >
+                    View Pricing
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Admin Message */}
+            {showAdminMessage && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mt-4 text-center">
+                <p className="text-blue-800 dark:text-blue-200 font-medium mb-3">
+                  Admin accounts cannot use the chat feature. Please sign up with a personal account to use chat.
+                </p>
+                <div className="flex flex-col sm:flex-row justify-center gap-3">
+                  <button
+                    onClick={() => setShowAdminMessage(false)}
+                    className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md font-medium transition text-sm"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={() => router.push("/auth/signup")}
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md font-medium transition text-sm"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -345,59 +454,6 @@ export default function HeroSection() {
           <FinalCTA />
         </motion.div>
       </div>
-
-      {/* Trial Expired Popup */}
-      {trialExpired && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 text-gray-700 dark:text-gray-300 px-4">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-sm sm:max-w-md text-center border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Trial Expired</h2>
-            <p className="mb-6 text-gray-600 dark:text-gray-300">
-              Your trial period has ended. If you want to proceed, please log in or upgrade your account.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-3">
-              <button
-                onClick={() => router.push("/auth/login")}
-                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-semibold transition"
-              >
-                Login
-              </button>
-              <button
-                onClick={() => router.push("/pricing")}
-                className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md font-semibold mt-2 sm:mt-0 transition"
-              >
-                View Pricing
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Admin User Popup */}
-      {isAdminPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 text-gray-700 dark:text-gray-300 px-4">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-sm sm:max-w-md text-center border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Admin Account Detected</h2>
-            <p className="mb-6 text-gray-600 dark:text-gray-300">
-              Your account has admin privileges. Admin accounts cannot use the chat feature. 
-              If you want to use the chat, please sign up with a personal account.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-3">
-              <button
-                onClick={() => setIsAdminPopup(false)}
-                className="px-6 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md font-semibold transition"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => router.push("/auth/signup")}
-                className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md font-semibold mt-2 sm:mt-0 transition"
-              >
-                Sign Up
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

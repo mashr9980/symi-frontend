@@ -335,7 +335,7 @@ export default function PricingSection() {
                         <span className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
                           {plan.currency === 'eur' ? '€' : '$'}{displayPrice}
                         </span>
-                        <span className="text-gray-500 dark:text-gray-400 text-sm self-end mb-2">/ month</span>
+                        {/* <span className="text-gray-500 dark:text-gray-400 text-sm self-end mb-2">/ month</span> */}
                       </div>
                     </div>
                   </div>
