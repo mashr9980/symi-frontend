@@ -58,26 +58,7 @@ export default function HeroSection() {
           typeof parsed[0].ai === "string"
         ) {
           setChatHistory(parsed);
-
-          // --- Check payment status on page load if chatHistory exists ---
-          (async () => {
-            const paymentData = await getPaymentStatusFromCache();
-            setPaymentData(paymentData);
-
-            const status = paymentData?.status;
-            const expiredStatus = paymentData?.expiredStatus;
-
-            const userRole = getUserRole();
-            // Show appropriate message based on user role
-            if (userRole === "admin") {
-              setShowAdminMessage(true);
-              setHasAskedSecondQuestion(true);
-            } else {
-              // Show trial expired message for regular users
-              setHasAskedSecondQuestion(true);
-              setShowTrialMessage(true);
-            }
-          })();
+          // Don't show messages on page load, only when user tries to chat again
         }
       } catch {
         // ignore
@@ -125,6 +106,28 @@ export default function HeroSection() {
       // Keep emojis normal size
       .replace(/(📊|🤖|📈|💰)/g, '$1');
   };
+
+  // Auto-hide trial message after 5 seconds
+  useEffect(() => {
+    if (showTrialMessage) {
+      const timer = setTimeout(() => {
+        setShowTrialMessage(false);
+      }, 5000); // Hide after 5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [showTrialMessage]);
+
+  // Auto-hide admin message after 5 seconds
+  useEffect(() => {
+    if (showAdminMessage) {
+      const timer = setTimeout(() => {
+        setShowAdminMessage(false);
+      }, 5000); // Hide after 5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [showAdminMessage]);
 
   // Connect and send message via WebSocket
   const handleChatSend = async () => {
@@ -243,7 +246,7 @@ export default function HeroSection() {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder={loading ? "Sending..." : "One sentence about who you are or what you're creating."}
-              className={`text-gray-700 dark:text-gray-300 w-full pr-24 px-6 py-4 rounded-xl border border-gray-300 dark:border-gray-600 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3300fa] transition bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm ${loading ? "bg-gray-100 text-gray-400" : ""}`}
+              className={`text-gray-700 dark:text-gray-300 w-full pr-24 px-6 py-4 rounded-xl border border-gray-300 dark:border-gray-600 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3300fa] transition backdrop-blur-sm backdrop-blur-sm ${loading ? "bg-gray-100 text-gray-400" : ""}`}
               disabled={chatDisabled}
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleChatSend();
@@ -279,46 +282,58 @@ export default function HeroSection() {
             </motion.button>
           </div>
 
-          {/* Trial Expired Floating Message */}
           {showTrialMessage && (
             <motion.div 
-              className="bg-gradient-to-r from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-800/20 border border-orange-200 dark:border-orange-700 rounded-2xl p-4 mb-6 backdrop-blur-sm shadow-lg"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-gradient-to-r from-orange-100 to-orange-50 dark:from-orange-900/90 dark:to-orange-800/80 border border-orange-200 dark:border-orange-700 rounded-2xl p-6 backdrop-blur-sm shadow-lg max-w-md"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
             >
               <div className="text-center">
-                <p className="text-orange-800 dark:text-orange-200 font-medium mb-3 text-sm">
+                <p className="text-orange-800 dark:text-orange-200 font-medium mb-4 text-base">
                   Your trial has ended. Please log in or upgrade your account to continue.
                 </p>
                 <div className="flex flex-col sm:flex-row justify-center gap-3">
                   <button
-                    onClick={() => router.push("/auth/login")}
+                    onClick={() => {
+                      setShowTrialMessage(false);
+                      router.push("/auth/login");
+                    }}
                     className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-lg font-medium transition-all duration-200 text-sm shadow-sm"
                   >
                     Login
                   </button>
                   <button
-                    onClick={() => router.push("/pricing")}
+                    onClick={() => {
+                      setShowTrialMessage(false);
+                      router.push("/pricing");
+                    }}
                     className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg font-medium transition-all duration-200 text-sm shadow-sm"
                   >
                     View Pricing
+                  </button>
+                  <button
+                    onClick={() => setShowTrialMessage(false)}
+                    className="px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white rounded-lg font-medium transition-all duration-200 text-sm shadow-sm"
+                  >
+                    Close
                   </button>
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* Admin Floating Message */}
           {showAdminMessage && (
             <motion.div 
-              className="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-800/20 border border-blue-200 dark:border-blue-700 rounded-2xl p-4 mb-6 backdrop-blur-sm shadow-lg"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-gradient-to-r from-blue-100 to-blue-50 dark:from-blue-900/90 dark:to-blue-800/80 border border-blue-200 dark:border-blue-700 rounded-2xl p-6 backdrop-blur-sm shadow-lg max-w-md"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
             >
               <div className="text-center">
-                <p className="text-blue-800 dark:text-blue-200 font-medium mb-3 text-sm">
+                <p className="text-blue-800 dark:text-blue-200 font-medium mb-4 text-base">
                   Admin accounts cannot use the chat feature. Please sign up with a personal account to use chat.
                 </p>
                 <div className="flex flex-col sm:flex-row justify-center gap-3">
@@ -329,7 +344,10 @@ export default function HeroSection() {
                     Close
                   </button>
                   <button
-                    onClick={() => router.push("/auth/signup")}
+                    onClick={() => {
+                      setShowAdminMessage(false);
+                      router.push("/auth/signup");
+                    }}
                     className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-lg font-medium transition-all duration-200 text-sm shadow-sm"
                   >
                     Sign Up
@@ -351,93 +369,63 @@ export default function HeroSection() {
           {/* Chat Section */}
           <div className="w-full max-w-2xl mx-auto mt-6">
             {(chatHistory.length > 0 || loading) && (
-              <div className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl shadow-lg p-6 text-left text-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-700">
-                {/* User Question - Compact */}
-                <div className="mb-4">
-                  <div className="flex items-start">
-                    <span className="font-semibold text-indigo-700 dark:text-indigo-300 mr-2 text-sm">You:</span>
-                    <span className="text-sm flex-1">
-                      {chatHistory.length > 0 ? chatHistory[0].user : inputText}
-                    </span>
-                  </div>
-                </div>
-
-                {/* AI Response - Compact */}
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                  <div className="flex items-start mb-2">
-                    <span className="font-semibold text-purple-700 dark:text-purple-300 mr-2 text-sm">SYMI:</span>
-                    {loading && (
-                      <div className="flex items-center">
-                        <svg className="animate-spin h-4 w-4 mr-2 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                        </svg>
-                        <span className="text-purple-500 text-xs">Analyzing...</span>
+              <div className="backdrop-blur-sm backdrop-blur-sm rounded-xl shadow-lg p-6 border border-gray-100 dark:border-gray-700">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                  Your Conversation with SYMI
+                </h3>
+                
+                <div className="space-y-4">
+                  {/* Question Section */}
+                  <div className="backdrop-blur-sm backdrop-blur-md border border-gray-200 dark:border-gray-600 rounded-xl shadow-md">
+                    <div className="px-6 py-5">
+                      <div className="flex justify-between items-center">
+                        <div className="flex-1">
+                          <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400 block mb-1">You asked:</span>
+                          <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                            {chatHistory.length > 0 ? chatHistory[0].user : inputText}
+                          </span>
+                        </div>
                       </div>
-                    )}
+                    </div>
                   </div>
-                  
-                  {chatHistory[0]?.ai && (
-                    <div 
-                      className="text-sm leading-relaxed max-h-96 overflow-y-auto"
-                      dangerouslySetInnerHTML={{ 
-                        __html: formatAIContent(chatHistory[0].ai) 
-                      }}
-                    />
-                  )}
-                </div>
 
-                {/* Status - Very compact */}
-                <div className="text-xs text-gray-400 mt-4 pt-3 border-t border-gray-100 dark:border-gray-800">
-                  {loading
-                    ? "🧠 SYMI is thinking..."
-                    : "✨ This was your free demo. Ask another question to see upgrade options."}
-                </div>
-              </div>
-            )}
+                  {/* Answer Section */}
+                  <div className="backdrop-blur-sm backdrop-blur-md border border-gray-200 dark:border-gray-600 rounded-xl shadow-md">
+                    <div className="px-6 py-5">
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-sm font-medium text-purple-600 dark:text-purple-400">SYMI's Response:</span>
+                        {loading && (
+                          <div className="flex items-center">
+                            <svg className="animate-spin h-4 w-4 mr-2 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                            </svg>
+                            <span className="text-purple-500 text-xs">Analyzing...</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {chatHistory[0]?.ai && (
+                        <div 
+                          className="text-base text-gray-700 dark:text-gray-300 leading-relaxed max-h-96 overflow-y-auto"
+                          dangerouslySetInnerHTML={{ 
+                            __html: formatAIContent(chatHistory[0].ai) 
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
 
-            {/* Trial Expired Message */}
-            {showTrialMessage && (
-              <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-4 mt-4 text-center">
-                <p className="text-orange-800 dark:text-orange-200 font-medium mb-3">
-                  Your trial has ended. Please log in or upgrade your account to continue.
-                </p>
-                <div className="flex flex-col sm:flex-row justify-center gap-3">
-                  <button
-                    onClick={() => router.push("/auth/login")}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium transition text-sm"
-                  >
-                    Login
-                  </button>
-                  <button
-                    onClick={() => router.push("/pricing")}
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md font-medium transition text-sm"
-                  >
-                    View Pricing
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Admin Message */}
-            {showAdminMessage && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mt-4 text-center">
-                <p className="text-blue-800 dark:text-blue-200 font-medium mb-3">
-                  Admin accounts cannot use the chat feature. Please sign up with a personal account to use chat.
-                </p>
-                <div className="flex flex-col sm:flex-row justify-center gap-3">
-                  <button
-                    onClick={() => setShowAdminMessage(false)}
-                    className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md font-medium transition text-sm"
-                  >
-                    Close
-                  </button>
-                  <button
-                    onClick={() => router.push("/auth/signup")}
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md font-medium transition text-sm"
-                  >
-                    Sign Up
-                  </button>
+                  {/* Status Section - FAQ Style */}
+                  <div className="backdrop-blur-sm backdrop-blur-md border border-gray-200/40 dark:border-gray-600/40 rounded-xl shadow-md">
+                    <div className="px-6 py-4">
+                      <div className="text-sm text-gray-600 dark:text-gray-400 text-center">
+                        {loading
+                          ? "🧠 SYMI is thinking..."
+                          : "✨ This was your free demo. Ask another question to see upgrade options."}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
