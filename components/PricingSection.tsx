@@ -400,7 +400,7 @@ export default function PricingSection() {
                         )}
                       </button>
                     )}
-                    <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3 opacity-80">No credit card required to start</p>
+                    {/* <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3 opacity-80">No credit card required to start</p> */}
                   </div>
                 </div>
               </motion.div>

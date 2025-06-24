@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import config from "../config";
 import { isTokenExpired, handleLogout, getPaymentStatusFromCache } from "../utils/auth";
-import { Send, Mic, Bot, Sparkles } from "lucide-react";
+import { Send, Mic, Bot, Sparkles, SkipForward } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Add TypeScript definitions for Web Speech API
@@ -67,6 +67,12 @@ export default function PromptSection() {
   const [isMobile, setIsMobile] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  // Skip functionality states
+  const [showSkipButton, setShowSkipButton] = useState(false);
+  const [showSkipConfirmation, setShowSkipConfirmation] = useState(false);
+  const [chatComplete, setChatComplete] = useState(false);
+  const [skippedToReport, setSkippedToReport] = useState(false);
   
   // Refs
   const webSocketRef = useRef<WebSocket | null>(null);
@@ -193,6 +199,26 @@ export default function PromptSection() {
             setQuestion(data.content);
             setLoading(false);
             
+            // Check for flags in the message
+            if (data.flags) {
+              if (data.flags.showSkipButton) {
+                setShowSkipButton(true);
+              }
+              if (data.flags.chatComplete) {
+                setChatComplete(true);
+                setShowSkipButton(false);
+              }
+              if (data.flags.skippedToReport) {
+                setSkippedToReport(true);
+                setChatComplete(true);
+                setShowSkipButton(false);
+              }
+              if (data.flags.auditComplete) {
+                setChatComplete(true);
+                setShowSkipButton(false);
+              }
+            }
+            
             // Add message to chat history
             setChatHistory(prev => [
               ...prev, 
@@ -205,6 +231,8 @@ export default function PromptSection() {
           }
           
           if (data.type?.toLowerCase() === "complete") {
+            setChatComplete(true);
+            setShowSkipButton(false);
             setShowPopup(true);
           }
         } catch (error) {
@@ -304,6 +332,26 @@ export default function PromptSection() {
       setUserInput("");
       setLoading(true);
     }
+  };
+
+  // Handle skip button click
+  const handleSkipClick = () => {
+    setShowSkipConfirmation(true);
+  };
+
+  // Handle skip confirmation
+  const confirmSkip = () => {
+    if (webSocketRef.current && webSocketRef.current.readyState === WebSocket.OPEN) {
+      // Send skip action to backend
+      const skipAction = JSON.stringify({ action: "skip_to_report" });
+      webSocketRef.current.send(skipAction);
+    }
+    setShowSkipConfirmation(false);
+  };
+
+  // Handle skip cancellation
+  const cancelSkip = () => {
+    setShowSkipConfirmation(false);
   };
 
   // Handle "Enter" key press (send message on Enter, add new line on Shift+Enter)
@@ -427,7 +475,6 @@ export default function PromptSection() {
         )}
 
         {/* Header */}
-        {/* {!isAdmin && ( */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center">
             <div className="w-10 h-10 rounded-full flex items-center justify-center mr-2 bg-[#4C00FF]/10 dark:bg-[#4C00FF]/20">
@@ -513,58 +560,142 @@ export default function PromptSection() {
             <div ref={messagesEndRef} />
           </AnimatePresence>
         </div>
+
+        {/* Report Generation Available Banner */}
+        {(chatComplete || skippedToReport) && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-4 p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-green-800 dark:text-green-200 font-medium">
+                  {skippedToReport 
+                    ? "You've skipped to report generation. Your responses have been saved."
+                    : "Great! You've completed the questionnaire."}
+                </p>
+                <p className="text-green-600 dark:text-green-300 text-sm">
+                  You can now generate your Business Transformation Blueprint™ report.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowPopup(true)}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors shadow-sm"
+              >
+                Generate Report
+              </button>
+            </div>
+          </motion.div>
+        )}
         
         {/* Input Area */}
-        <div className="p-4 rounded-2xl shadow-lg bg-white/80 dark:bg-gray-800/50 backdrop-blur-md border border-purple-100/50 dark:border-purple-500/20">
-          <div className="flex items-end gap-2">
-            <div className="relative flex-1">
-              <textarea
-                ref={textareaRef}
-                placeholder="How can I help you scale your business system today?"
-                value={userInput}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyPress}
-                className="w-full px-4 py-3 pr-12 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 dark:focus:ring-[#6E30FF]/50 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 border border-gray-200 dark:border-gray-700"
-                rows={1}
-                style={{ minHeight: '50px', maxHeight: '150px' }}
-              />
+        {!chatComplete && !skippedToReport && (
+          <div className="p-4 rounded-2xl shadow-lg bg-white/80 dark:bg-gray-800/50 backdrop-blur-md border border-purple-100/50 dark:border-purple-500/20">
+            <div className="flex items-end gap-2">
+              <div className="relative flex-1">
+                <textarea
+                  ref={textareaRef}
+                  placeholder="How can I help you scale your business system today?"
+                  value={userInput}
+                  onChange={handleInputChange}
+                  onKeyDown={handleKeyPress}
+                  className="w-full px-4 py-3 pr-12 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-[#4C00FF]/50 dark:focus:ring-[#6E30FF]/50 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 border border-gray-200 dark:border-gray-700"
+                  rows={1}
+                  style={{ minHeight: '50px', maxHeight: '150px' }}
+                />
+              </div>
+              
+              <div className="flex gap-2">
+                {/* Skip Button - Only show when showSkipButton is true */}
+                {showSkipButton && (
+                  <button
+                    onClick={handleSkipClick}
+                    disabled={loading}
+                    className="p-3 rounded-xl transition-colors bg-orange-500 hover:bg-orange-600 text-white disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+                    title="Skip remaining questions"
+                  >
+                    <SkipForward className="w-5 h-5" />
+                  </button>
+                )}
+
+                {/* Voice Input Button */}
+                <button
+                  onClick={toggleListening}
+                  className={`p-3 rounded-xl transition-colors ${
+                    isListening 
+                      ? 'bg-red-500 hover:bg-red-600 text-white dark:bg-red-600 dark:hover:bg-red-700' 
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200'
+                  }`}
+                >
+                  <Mic className="w-5 h-5" />
+                </button>
+                
+                {/* Send Button */}
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!userInput.trim() || loading}
+                  className={`p-3 rounded-xl transition-colors ${
+                    !userInput.trim() || loading
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+                      : 'bg-gradient-to-r from-[#4C00FF] to-[#6E30FF] hover:from-[#4200e6] hover:to-[#5d28d8] text-white shadow-md shadow-purple-500/20'
+                  }`}
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </div>
             </div>
             
-            <div className="flex gap-2">
-              {/* Voice Input Button */}
-              <button
-                onClick={toggleListening}
-                className={`p-3 rounded-xl transition-colors ${
-                  isListening 
-                    ? 'bg-red-500 hover:bg-red-600 text-white dark:bg-red-600 dark:hover:bg-red-700' 
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200'
-                }`}
-              >
-                <Mic className="w-5 h-5" />
-              </button>
-              
-              {/* Send Button */}
-              <button
-                onClick={handleSendMessage}
-                disabled={!userInput.trim() || loading}
-                className={`p-3 rounded-xl transition-colors ${
-                  !userInput.trim() || loading
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
-                    : 'bg-gradient-to-r from-[#4C00FF] to-[#6E30FF] hover:from-[#4200e6] hover:to-[#5d28d8] text-white shadow-md shadow-purple-500/20'
-                }`}
-              >
-                <Send className="w-5 h-5" />
-              </button>
+            <div className="mt-2 flex justify-between items-center">
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                {isListening ? 'Listening... Speak now' : 'Press Enter to send, Shift+Enter for new line'}
+              </div>
+              {showSkipButton && (
+                <div className="text-xs text-orange-600 dark:text-orange-400">
+                  Click skip if you want to proceed to report generation
+                </div>
+              )}
             </div>
           </div>
-          
-          <div className="mt-2 flex justify-between items-center">
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              {isListening ? 'Listening... Speak now' : 'Press Enter to send, Shift+Enter for new line'}
-            </div>
-          </div>
-        </div>
+        )}
       </div>
+
+      {/* Skip Confirmation Modal */}
+      {showSkipConfirmation && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 px-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md p-6 rounded-2xl shadow-2xl bg-white dark:bg-gray-800 border border-purple-100/50 dark:border-purple-500/20"
+          >
+            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-white">
+              Skip Remaining Questions?
+            </h2>
+            <div className="mb-6">
+              <p className="text-gray-700 dark:text-gray-300 mb-4">
+                Are you sure you want to skip the remaining questions and proceed to report generation?
+              </p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                Your current responses will be saved, but you may miss some insights that could help improve your business system.
+              </p>
+            </div>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={cancelSkip}
+                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300"
+              >
+                Continue Answering
+              </button>
+              <button
+                onClick={confirmSkip}
+                className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg shadow-md"
+              >
+                Yes, Skip to Report
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
       
       {/* Popup Modal */}
       {showPopup && (
